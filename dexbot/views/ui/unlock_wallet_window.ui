@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>DEXBot - Unlock wallet</string>
+   <string>EVRAZ DEXbot - Unlock wallet</string>
   </property>
   <property name="modal">
    <bool>true</bool>

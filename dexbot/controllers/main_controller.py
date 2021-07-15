@@ -36,7 +36,7 @@ class MainController:
         self.pyqt_handler.setLevel(logging.INFO)
         logger.addHandler(self.pyqt_handler)
         logger.info(
-            "DEXBot {} on python {} {}".format(VERSION, sys.version[:6], sys.platform),
+            "EVRAZ DEXbot {} on python {} {}".format(VERSION, sys.version[:6], sys.platform),
             extra={'worker_name': 'NONE', 'account': 'NONE', 'market': 'NONE'},
         )
 

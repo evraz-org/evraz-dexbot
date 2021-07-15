@@ -270,7 +270,7 @@ def configure_dexbot(config, ctx):
 
     :param dexbot.config.Config config: dexbot config
     """
-    whiptail = get_whiptail('DEXBot configure')
+    whiptail = get_whiptail('EVRAZ DEXbot configure')
     workers = config.get('workers', {})
     bitshares_instance = ctx.bitshares
     validator = ConfigValidator(config, bitshares_instance)
@@ -282,7 +282,7 @@ def configure_dexbot(config, ctx):
                 whiptail.alert("Worker name cannot be blank. ")
             else:
                 config['workers'] = {txt: configure_worker(whiptail, {}, validator)}
-                if not whiptail.confirm("Set up another worker?\n(DEXBot can run multiple workers in one instance)"):
+                if not whiptail.confirm("Set up another worker?\n(EVRAZ DEXbot can run multiple workers in one instance)"):
                     break
         setup_systemd(whiptail, config)
     else:
