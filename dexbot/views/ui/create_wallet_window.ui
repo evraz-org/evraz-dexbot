@@ -32,7 +32,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Before you can start using DEXBot, you need to create an uptick wallet.</string>
+      <string>Before you can start using EVRAZ DEXbot, you need to create an uptick wallet.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

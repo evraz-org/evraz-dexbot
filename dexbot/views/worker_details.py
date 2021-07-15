@@ -24,7 +24,7 @@ class WorkerDetailsView(QtWidgets.QDialog, Ui_details_dialog, Ui_Graph_Tab, Ui_T
         self.setupUi(self)
 
         # Add worker's name to the dialog title
-        self.setWindowTitle("DEXBot - {} details".format(worker_name))
+        self.setWindowTitle("EVRAZ DEXbot - {} details".format(worker_name))
 
         # Get strategy class from the config
         strategy_class = getattr(importlib.import_module(self.config.get('module')), 'Strategy')

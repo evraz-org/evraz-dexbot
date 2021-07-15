@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>DEXBot - Worker details</string>
+   <string>EVRAZ DEXbot - Worker details</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_13">
    <item>

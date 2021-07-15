@@ -124,7 +124,7 @@ def runservice():
         os.system('systemctl --user stop dexbot')
 
     if not os.path.exists(SYSTEMD_SERVICE_NAME):
-        setup_systemd(get_whiptail('DEXBot configure'), {})
+        setup_systemd(get_whiptail('EVRAZ DEXbot configure'), {})
 
     click.echo("Starting dexbot daemon")
     os.system("systemctl --user start dexbot")

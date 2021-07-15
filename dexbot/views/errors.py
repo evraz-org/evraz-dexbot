@@ -35,7 +35,7 @@ class PyQtHandler(logging.Handler):
             if hasattr(record, "worker_name"):
                 title = "Error on {}".format(record.worker_name)
             else:
-                title = "DEXBot Error"
+                title = "EVRAZ DEXbot Error"
             idle_add(show_dialog, title, message, extra, detail)
         else:
             if self.info_handler and hasattr(record, "worker_name"):
@@ -53,7 +53,7 @@ class ErrorDialog(QtWidgets.QDialog, Ui_Dialog):
         self.resize(400, 1)
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinimizeButtonHint)
 
-        self.setWindowTitle('DEXBot - {}'.format(title))
+        self.setWindowTitle('EVRAZ DEXbot - {}'.format(title))
         self.message_label.setText(message)
 
         self.hide_details.hide()
@@ -95,7 +95,7 @@ def gui_error(func):
         try:
             return func(*args, **kwargs)
         except BaseException as exc:
-            show_dialog("DEXBot Error", "An error occurred with DEXBot: \n" + repr(exc), None, traceback.format_exc())
+            show_dialog("EVRAZ DEXbot Error", "An error occurred with EVRAZ DEXbot: \n" + repr(exc), None, traceback.format_exc())
 
     return func_wrapper
 
