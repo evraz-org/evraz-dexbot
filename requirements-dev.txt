@@ -6,4 +6,5 @@ pytest>=5,<6
 pre-commit>=1.20.0,<2
 
 # Make bundled executables
-pyinstaller>=3.4,<4
+pyinstaller>=5
+pycryptodomex>=3,<4

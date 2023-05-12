@@ -8,4 +8,7 @@ hiddenimports = [
     'Crypto.Hash._SHA256',
     'Crypto.Util._cpuid',
     'Crypto.Util._strxor',
+    'Cryptodome.Cipher',
+    'Cryptodome.Util',
+    'Cryptodome.Hash',
 ]
