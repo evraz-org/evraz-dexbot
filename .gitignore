@@ -94,3 +94,5 @@ archive
 
 # pre-commit hooks
 !.pre-commit-config.yaml
+installer/windows/.vs/
+.vscode/
