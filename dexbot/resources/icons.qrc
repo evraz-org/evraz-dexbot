@@ -9,6 +9,8 @@
     <file>svg/dexbot.svg</file>
   </qresource>
   <qresource prefix="dialog">
+    <file>svg/eye_close.svg</file>
+    <file>svg/eye_open.svg</file>
     <file>img/error.png</file>
   </qresource>
 </RCC>
