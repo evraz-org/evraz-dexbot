@@ -15,6 +15,22 @@
       <ComponentRef Id="ApplicationShortcut" />
       <ComponentRef Id="ApplicationShortcutDesktop" />
     </Feature>
+	  <UI>
+		  <UIRef Id="WixUI_InstallDir" />
+
+		  <!-- Skip license dialog -->
+		  <Publish Dialog="WelcomeDlg"
+				   Control="Next"
+				   Event="NewDialog"
+				   Value="InstallDirDlg"
+				   Order="2">1</Publish>
+		  <Publish Dialog="InstallDirDlg"
+				   Control="Back"
+				   Event="NewDialog"
+				   Value="WelcomeDlg"
+				   Order="2">1</Publish>
+	  </UI>
+	<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
   </Product>
   <Fragment>
     <Icon Id="icon.ico" SourceFile="assets\dexbot-icon.ico"/>
@@ -27,7 +43,7 @@
           <Shortcut
               Id="ApplicationDesktopShortcut"
               Name="DEXBot"
-              Description="Bitshares DEXBot"
+              Description="EVRAZ DEXbot"
               Target="[INSTALLDIR]\DEXBot.exe"
               WorkingDirectory="INSTALLDIR" Icon="ProductIcon">
             <Icon Id="ProductIcon" SourceFile="assets\dexbot-icon.ico" />
@@ -35,7 +51,7 @@
           <RemoveFolder Id="DesktopFolder" On="uninstall"/>
           <RegistryValue
               Root="HKCU"
-              Key="Software/MyAppName"
+              Key="Software/EVRAZ_Bot"
               Name="installed"
               Type="integer"
               Value="1"
@@ -46,16 +62,16 @@
 
       <!-- Begin program files entry-->
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="APPLICATIONFOLDER" Name="Bitshares">
+        <Directory Id="APPLICATIONFOLDER" Name="EVRAZ">
           <Directory Id="INSTALLDIR" Name="$(var.ApplicationName)" >
           </Directory>
         </Directory>
       </Directory>
       <!-- End program files entry-->
 
-      <!-- Begin start menu entry -->
+		<!-- Begin start menu entry -->
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="Bitshares"/>
+        <Directory Id="ApplicationProgramsFolder" Name="EVRAZ"/>
       </Directory>
     </Directory>
 
@@ -63,11 +79,11 @@
       <Component Id="ApplicationShortcut" Guid="1BFD9CC9-8208-49C1-AB8D-3DC2B7877792">
         <Shortcut Id="ApplicationStartMenuShortcut"
                   Name="DEXBot"
-                  Description="Bitshares DEXBot"
+                  Description="EVRAZ DEXBot"
                   Target="[INSTALLDIR]\DEXBot.exe"
                   WorkingDirectory="INSTALLDIR"/>
         <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\Bitshares\DEXBot" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        <RegistryValue Root="HKCU" Key="Software\EVRAZ\DEXBot" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
     <!-- End start menu entry-->
