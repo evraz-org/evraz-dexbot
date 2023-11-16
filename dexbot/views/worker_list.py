@@ -166,7 +166,7 @@ class MainView(QMainWindow, Ui_MainWindow):
     @staticmethod
     @pyqtSlot(name='handle_open_documentation')
     def handle_open_documentation():
-        webbrowser.open('https://github.com/Codaone/DEXBot/wiki')
+        webbrowser.open('https://github.com/evraz-org/evrazdex-bot/wiki')
 
     def set_worker_name(self, worker_name, value):
         self.worker_widgets[worker_name].set_worker_name(value)
