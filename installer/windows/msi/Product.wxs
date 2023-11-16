@@ -42,7 +42,7 @@
         <Component Id="ApplicationShortcutDesktop" Guid="*">
           <Shortcut
               Id="ApplicationDesktopShortcut"
-              Name="DEXBot"
+              Name="EVRAZ DEXbot"
               Description="EVRAZ DEXbot"
               Target="[INSTALLDIR]\DEXBot.exe"
               WorkingDirectory="INSTALLDIR" Icon="ProductIcon">
@@ -78,7 +78,7 @@
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="ApplicationShortcut" Guid="1BFD9CC9-8208-49C1-AB8D-3DC2B7877792">
         <Shortcut Id="ApplicationStartMenuShortcut"
-                  Name="DEXBot"
+                  Name="EVRAZ DEXbot"
                   Description="EVRAZ DEXBot"
                   Target="[INSTALLDIR]\DEXBot.exe"
                   WorkingDirectory="INSTALLDIR"/>
