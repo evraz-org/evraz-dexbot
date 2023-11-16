@@ -21,7 +21,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">* {
-    background-color: #152B2A;
+    background-color: #000000;
 }
 
 QScrollBar {
@@ -76,7 +76,7 @@ QScrollBar {
          <x>0</x>
          <y>0</y>
          <width>1029</width>
-         <height>340</height>
+         <height>341</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -85,11 +85,11 @@ QScrollBar {
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTipDuration">
+        <number>-7</number>
+       </property>
        <property name="styleSheet">
         <string notr="true">color: white;</string>
-       </property>
-       <property name="toolTipDuration" stdset="0">
-        <number>-7</number>
        </property>
       </widget>
      </widget>
@@ -176,7 +176,7 @@ QScrollBar {
           <property name="spacing">
            <number>0</number>
           </property>
-          <property name="margin">
+          <property name="margin" stdset="0">
            <number>0</number>
           </property>
           <item>
@@ -211,14 +211,14 @@ QScrollBar {
                <property name="cursor">
                 <cursorShape>PointingHandCursor</cursorShape>
                </property>
+               <property name="toolTipDuration">
+                <number>-1</number>
+               </property>
                <property name="styleSheet">
                 <string notr="true">border: 0px; background-color: #5581e8; width: 250px; height: 20px; border-radius: 10px; color: #ffffff;</string>
                </property>
                <property name="text">
                 <string>Unlock wallet</string>
-               </property>
-               <property name="toolTipDuration" stdset="0">
-                <number>-1</number>
                </property>
               </widget>
              </item>
@@ -261,14 +261,14 @@ QScrollBar {
                <property name="cursor">
                 <cursorShape>PointingHandCursor</cursorShape>
                </property>
+               <property name="toolTipDuration">
+                <number>-1</number>
+               </property>
                <property name="styleSheet">
-                <string notr="true">border: 0px; background-color: #3A6257; width: 250px; height: 20px; border-radius: 10px; color: #ffffff;</string>
+                <string notr="true">border: 0px; background-color: #424242; width: 250px; height: 20px; border-radius: 10px; color: #ffffff;</string>
                </property>
                <property name="text">
                 <string>Add worker</string>
-               </property>
-               <property name="toolTipDuration" stdset="0">
-                <number>-1</number>
                </property>
               </widget>
              </item>
@@ -305,7 +305,7 @@ QScrollBar {
           <property name="spacing">
            <number>0</number>
           </property>
-          <property name="margin">
+          <property name="margin" stdset="0">
            <number>0</number>
           </property>
           <item>
@@ -326,7 +326,7 @@ QScrollBar {
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="styleSheet">
-             <string notr="true">border: 0px; background-color: #3A6257; width: 250px; height: 30px; border-radius: 10px; color: #ffffff;</string>
+             <string notr="true">border: 0px; background-color: #424242; width: 250px; height: 30px; border-radius: 10px; color: #ffffff;</string>
             </property>
             <property name="text">
              <string>Settings</string>
@@ -351,7 +351,7 @@ QScrollBar {
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="styleSheet">
-             <string notr="true">border: 0px; background-color: #3A6257; width: 250px; height: 30px; border-radius: 10px; color: #ffffff;</string>
+             <string notr="true">border: 0px; background-color: #424242; width: 250px; height: 30px; border-radius: 10px; color: #ffffff;</string>
             </property>
             <property name="text">
              <string>Help</string>
