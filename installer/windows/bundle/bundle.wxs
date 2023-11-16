@@ -8,7 +8,7 @@
           Version='$(var.ApplicationVersion)'
           Manufacturer="$(var.Manufacturer)"
           IconSourceFile="assets/dexbot-icon.ico"
-          UpgradeCode="5397E671-1059-487E-9E26-FD5E1095F77D">
+          UpgradeCode="1B96DE0B-928B-46D1-B05C-E5247BAA3F78">
 
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense" >
       <bal:WixStandardBootstrapperApplication

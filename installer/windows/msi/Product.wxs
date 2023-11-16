@@ -6,7 +6,7 @@
            Language="1033"
            Version="$(var.ApplicationVersion)"
            Manufacturer="$(var.Manufacturer)"
-           UpgradeCode="497F349B-D2F6-4488-9FE4-797E7E58B158" >
+           UpgradeCode="E4871E07-72F5-4B55-A7FE-C65C3B5EA3B4" >
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowDowngrades="no" Schedule="afterInstallExecute"  />
     <MediaTemplate EmbedCab="yes" />
@@ -76,7 +76,7 @@
     </Directory>
 
     <DirectoryRef Id="ApplicationProgramsFolder">
-      <Component Id="ApplicationShortcut" Guid="1BFD9CC9-8208-49C1-AB8D-3DC2B7877792">
+      <Component Id="ApplicationShortcut" Guid="31225B25-1218-475C-8E4A-04C115777DE3">
         <Shortcut Id="ApplicationStartMenuShortcut"
                   Name="EVRAZ DEXbot"
                   Description="EVRAZ DEXBot"
@@ -92,11 +92,11 @@
   <!-- Begin installed files -->
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLDIR">
-      <Component Id="Executable" Guid="BA839128-3480-4796-A8B1-4E8D229D7446">
+      <Component Id="Executable" Guid="F7445831-8483-4559-A6CD-C01D4518DAA1">
         <File Id="WinAppExe" Name="DEXBot.exe" Source="DEXBot.exe" Vital="yes" />
         <RemoveFolder Id="INSTALLDIR" On="uninstall" />
       </Component>
-      <Component Id="Documentation" Guid="A70DAF37-0EAC-49BD-A8B0-2C5D8AF81085">
+      <Component Id="Documentation" Guid="85496849-BAF1-4BC6-830B-0ADF25906A8D">
         <File Id="ReadMeTxt" Name="README.txt" Source="README.txt" Vital="yes" />
       </Component>
       </ComponentGroup>
