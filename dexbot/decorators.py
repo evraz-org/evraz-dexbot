@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from functools import wraps
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 def check_last_run(func):
     """
@@ -22,6 +22,6 @@ def check_last_run(func):
 
         self.last_check = datetime.now()
         delta = datetime.now() - start
-        self.log.debug('Maintenance execution took: {:.2f} seconds'.format(delta.total_seconds()))
+        self.log.debug(TS.decorators.format(delta.total_seconds()))
 
     return wrapper

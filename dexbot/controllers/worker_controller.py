@@ -11,7 +11,7 @@ from dexbot.views.confirmation import ConfirmationDialog
 from dexbot.views.errors import gui_error
 from dexbot.views.notice import NoticeDialog
 from dexbot.views.strategy_form import StrategyFormWidget
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class WorkerController:
     def __init__(self, view, bitshares_instance, mode):
@@ -32,11 +32,11 @@ class WorkerController:
         """
         strategies = collections.OrderedDict()
         strategies['dexbot.strategies.relative_orders'] = {
-            'name': 'Relative Orders',
+            'name': TS.worker_controller[0],
             'form_module': 'dexbot.views.ui.forms.relative_orders_widget_ui',
         }
-        strategies['dexbot.strategies.staggered_orders'] = {'name': 'Staggered Orders', 'form_module': ''}
-        strategies['dexbot.strategies.king_of_the_hill'] = {'name': 'King of the Hill', 'form_module': ''}
+        strategies['dexbot.strategies.staggered_orders'] = {'name': TS.worker_controller[1], 'form_module': ''}
+        strategies['dexbot.strategies.king_of_the_hill'] = {'name': TS.worker_controller[2], 'form_module': ''}
         for desc, module in find_external_strategies():
             strategies[module] = {'name': desc, 'form_module': module}
             # if there is no UI form in the module then GUI will gracefully revert to auto-ui
@@ -56,9 +56,9 @@ class WorkerController:
         """
         index = 1
         workers = Config().workers_data.keys()
-        worker_name = "Worker {0}".format(index)
+        worker_name = TS.worker_controller[3].format(index)
         while worker_name in workers:
-            worker_name = "Worker {0}".format(index)
+            worker_name = TS.worker_controller[3].worker_name.format(index)
             index += 1
 
         return worker_name
@@ -91,9 +91,7 @@ class WorkerController:
 
     @staticmethod
     def handle_save_dialog():
-        dialog = ConfirmationDialog(
-            'Saving the worker will cancel all the current orders.\n' 'Are you sure you want to do this?'
-        )
+        dialog = ConfirmationDialog(TS.worker_controller[4])
         return dialog.exec_()
 
     @gui_error
@@ -121,24 +119,24 @@ class WorkerController:
         old_worker_name = None if self.mode == 'add' else self.view.worker_name
 
         if not self.validator.validate_worker_name(worker_name, old_worker_name):
-            error_texts.append('Worker name needs to be unique. "{}" is already in use.'.format(worker_name))
+            error_texts.append(TS.worker_controller[5].format(worker_name))
         if not self.validator.validate_asset(base_asset):
-            error_texts.append('Field "Base Asset" does not have a valid asset.')
+            error_texts.append(TS.worker_controller[6])
         if not self.validator.validate_asset(quote_asset):
-            error_texts.append('Field "Quote Asset" does not have a valid asset.')
+            error_texts.append(TS.worker_controller[7])
         if not self.validator.validate_asset(fee_asset):
-            error_texts.append('Field "Fee Asset" does not have a valid asset.')
+            error_texts.append(TS.worker_controller[8])
         if not self.validator.validate_market(base_asset, quote_asset):
-            error_texts.append("Market {}/{} doesn't exist.".format(base_asset, quote_asset))
+            error_texts.append(TS.worker_controller[9].format(base_asset, quote_asset))
         if self.mode == 'add':
             account = self.view.account_input.text()
             private_key = self.view.private_key_input.text()
             if not self.validator.validate_account_name(account):
-                error_texts.append("Account doesn't exist.")
+                error_texts.append(TS.worker_controller[10])
             if not self.validator.validate_private_key(account, private_key):
-                error_texts.append('Private key is invalid.')
+                error_texts.append(TS.worker_controller[11])
             elif private_key and not self.validator.validate_private_key_type(account, private_key):
-                error_texts.append('Please use active private key.')
+                error_texts.append(TS.worker_controller[12])
 
         error_texts.extend(self.view.strategy_widget.strategy_controller.validation_errors())
         error_text = '\n'.join(error_texts)

@@ -4,14 +4,14 @@ from dexbot.decorators import check_last_run
 from dexbot.strategies.base import StrategyBase
 from dexbot.strategies.config_parts.relative_config import RelativeConfig
 from dexbot.strategies.external_feeds.price_feed import PriceFeed
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class Strategy(StrategyBase):
     """Relative Orders strategy."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.log.info("Initializing Relative Orders")
+        self.log.info(TS.relative_orders[0]) # Initializing Relative Orders
 
         # Tick counter
         self.counter = 0
@@ -93,19 +93,19 @@ class Strategy(StrategyBase):
 
         # Check for conflicting settings
         if self.is_reset_on_price_change and not self.is_center_price_dynamic:
-            self.log.error('"Reset orders on center price change" requires "Dynamic Center Price"')
+            self.log.error(TS.relative_orders[1]) # "Reset orders on center price change" requires "Dynamic Center Price"
             self.disabled = True
             return
 
         # Check if market has center price when using dynamic center price
         if not self.external_feed and self.empty_market and (self.is_center_price_dynamic or self.dynamic_spread):
-            self.log.info('Market is empty and using dynamic market parameters. Waiting for market change...')
+            self.log.info(TS.relative_orders[2]) # Market is empty and using dynamic market parameters. Waiting for market change...
             return
 
         # Check old orders from previous run (from force-interruption) only whether we are not using
         # "Reset orders on center price change" option
         if self.is_reset_on_price_change:
-            self.log.info('"Reset orders on center price change" is active, placing fresh orders')
+            self.log.info(TS.relative_orders[3]) # "Reset orders on center price change" is active, placing fresh orders
             self.update_orders()
         else:
             self.check_orders()
@@ -178,7 +178,7 @@ class Strategy(StrategyBase):
         We need to periodically check orders because cancelled orders do not triggers a market_update event
         """
         if self.is_reset_on_price_change and not self.counter % 8:
-            self.log.debug('Checking orders by tick threshold')
+            self.log.debug(TS.relative_orders[4]) # Checking orders by tick threshold
             self.check_orders()
         self.counter += 1
 
@@ -189,20 +189,20 @@ class Strategy(StrategyBase):
         :param external_price_source: External market name
         :return: Center price as float
         """
-        self.log.debug('inside get_external_mcp, exchange: {} '.format(external_price_source))
+        self.log.debug(TS.relative_orders[5].format(external_price_source)) # inside get_external_mcp, exchange: {} 
         market = self.market.get_string('/')
-        self.log.debug('market: {}  '.format(market))
+        self.log.debug(TS.relative_orders[6].format(market)) # market: {}  
         price_feed = PriceFeed(external_price_source, market)
         price_feed.filter_symbols()
         center_price = price_feed.get_center_price(None)
-        self.log.debug('PriceFeed: {}'.format(center_price))
+        self.log.debug(TS.relative_orders[7].format(center_price))
 
         if center_price is None:  # Try USDT
             center_price = price_feed.get_center_price("USDT")
-            self.log.debug('Substitute USD/USDT center price: {}'.format(center_price))
+            self.log.debug(TS.relative_orders[8].format(center_price))
             if center_price is None:  # Try consolidated
                 center_price = price_feed.get_consolidated_price()
-                self.log.debug('Consolidated center price: {}'.format(center_price))
+                self.log.debug(TS.relative_orders[9].format(center_price)) # Consolidated center price: {}
         return center_price
 
     def calculate_order_prices(self):
@@ -220,39 +220,39 @@ class Strategy(StrategyBase):
                 # Try getting center price from external source
                 center_price = self.get_external_market_center_price(self.external_price_source)
                 try:
-                    self.log.info('Using center price from external source: {:.8f}'.format(center_price))
+                    self.log.info(TS.relative_orders[10].format(center_price)) # Using center price from external source: {:.8f}
                 except TypeError:
-                    self.log.warning('Failed to obtain center price from external source')
+                    self.log.warning(TS.relative_orders[11]) # Failed to obtain center price from external source
             elif self.cp_from_last_trade and self['bootstrapped']:  # Using own last trade is bad idea at startup
                 try:
                     center_price = self.get_own_last_trade()['price']
-                    self.log.info('Using center price from last trade: {:.8f}'.format(center_price))
+                    self.log.info(TS.relative_orders[12].format(center_price)) # Using center price from last trade: {:.8f}
                 except TypeError:
-                    self.log.warning('Failed to obtain last trade price')
+                    self.log.warning(TS.relative_orders[13]) # Failed to obtain last trade price
                     try:
                         center_price = self.get_market_center_price()
                         self.log.info(
-                            'Using market center price (failed to obtain last trade): {:.8f}'.format(center_price)
+                            TS.relative_orders[14].format(center_price) # Using market center price (failed to obtain last trade): {:.8f}
                         )
                     except TypeError:
-                        self.log.warning('Failed to obtain center price from market')
+                        self.log.warning(TS.relative_orders[15]) # Failed to obtain center price from market
             elif self.center_price_depth > 0:
                 # Calculate with quote amount if given
                 center_price = self.get_market_center_price(quote_amount=self.center_price_depth)
                 try:
                     self.log.info(
-                        'Using market center price: {:.8f} with depth: {:.{prec}f}'.format(
+                        TS.relative_orders[16].format(
                             center_price, self.center_price_depth, prec=self.market['quote']['precision']
                         )
-                    )
+                    ) # Using market center price: {:.8f} with depth: {:.{prec}f}
                 except TypeError:
-                    self.log.warning('Failed to obtain depthted center price')
+                    self.log.warning(TS.relative_orders[17]) # Failed to obtain depthted center price
             else:
                 center_price = self.get_market_center_price()
                 try:
-                    self.log.info('Using market center price: {:.8f}'.format(center_price))
+                    self.log.info(TS.relative_orders[18].format(center_price)) # Using market center price: {:.8f}
                 except TypeError:
-                    self.log.warning('Failed to obtain center price from market')
+                    self.log.warning(TS.relative_orders[15]) # Failed to obtain center price from market
 
             self.center_price = self.calculate_center_price(
                 center_price, self.is_asset_offset, spread, self['order_ids'], self.manual_offset
@@ -264,14 +264,14 @@ class Strategy(StrategyBase):
             )
 
         try:
-            self.log.info('Center price after offsets calculation: {:.8f}'.format(self.center_price))
+            self.log.info(TS.relative_orders[19].format(self.center_price))
             self.buy_price = self.center_price / math.sqrt(1 + spread)
             self.sell_price = self.center_price * math.sqrt(1 + spread)
         except TypeError:
-            self.log.warning('No center price calculated')
+            self.log.warning(TS.relative_orders[20]) # No center price calculated
 
     def update_orders(self):
-        self.log.debug('Starting to update orders')
+        self.log.debug(TS.relative_orders[21]) # Starting to update orders
 
         # Cancel the orders before redoing them
         self.cancel_all_orders()
@@ -304,7 +304,7 @@ class Strategy(StrategyBase):
 
         self['order_ids'] = order_ids
 
-        self.log.info("Done placing orders")
+        self.log.info(TS.relative_orders[22]) # Done placing orders
 
         # Some orders weren't successfully created, redo them
         if len(order_ids) < expected_num_orders and not self.disabled:
@@ -549,7 +549,7 @@ class Strategy(StrategyBase):
 
                 if not current_order:
                     need_update = True
-                    self.log.debug('Could not find order on the market, it was filled, expired or cancelled')
+                    self.log.debug(TS.relative_orders[23]) # Could not find order on the market, it was filled, expired or cancelled
                 elif self.is_reset_on_partial_fill:
                     # Detect partially filled orders;
                     # on fresh order 'for_sale' is always equal to ['base']['amount']
@@ -558,7 +558,7 @@ class Strategy(StrategyBase):
                         diff_rel = diff_abs / current_order['base']['amount']
                         if diff_rel >= self.partial_fill_threshold:
                             need_update = True
-                            self.log.info('Partially filled order detected, filled {:.2%}'.format(diff_rel))
+                            self.log.info(TS.relative_orders[24].format(diff_rel)) # Partially filled order detected, filled {:.2%}
                             # FIXME: Need to write trade operation; possible race condition may occur: while
                             #        we're updating order it may be filled further so trade log entry will not
                             #        be correct
@@ -580,13 +580,13 @@ class Strategy(StrategyBase):
             )
             diff = abs((self.center_price - center_price) / self.center_price)
             if diff >= self.price_change_threshold:
-                self.log.debug('Center price changed, updating orders. Diff: {:.2%}'.format(diff))
+                self.log.debug(TS.relative_orders[25].format(diff)) # Center price changed, updating orders. Diff: {:.2%}
                 need_update = True
 
         if need_update:
             self.update_orders()
         elif self.initializing:
-            self.log.info("Orders correct on market")
+            self.log.info(TS.relative_orders[26]) # Orders correct on market
 
         self.initializing = False
 
@@ -626,12 +626,12 @@ class Strategy(StrategyBase):
 
         if highest_bid is None or highest_bid == 0.0:
             if not suppress_errors:
-                self.log.critical("Cannot estimate center price, there is no highest bid.")
+                self.log.critical(TS.relative_orders[27]) # Cannot estimate center price, there is no highest bid.
                 self.disabled = True
             return None
         elif lowest_ask is None or lowest_ask == 0.0:
             if not suppress_errors:
-                self.log.critical("Cannot estimate center price, there is no lowest ask.")
+                self.log.critical(TS.relative_orders[28]) # Cannot estimate center price, there is no lowest ask.
                 self.disabled = True
             return None
 

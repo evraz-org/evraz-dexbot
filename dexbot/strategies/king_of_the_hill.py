@@ -6,6 +6,7 @@ from bitshares.price import Price
 from dexbot.decorators import check_last_run
 from dexbot.strategies.base import StrategyBase
 from dexbot.strategies.config_parts.koth_config import KothConfig
+from dexbot.translator_strings import TranslatorStrings as TS
 
 STRATEGY_NAME = 'King of the Hill'
 
@@ -30,7 +31,7 @@ class Strategy(StrategyBase):
         # Initializes StrategyBase class
         super().__init__(*args, **kwargs)
 
-        self.log.info("Initializing {}...".format(STRATEGY_NAME))
+        self.log.info(TS.king_of_the_hill[0].format(STRATEGY_NAME)) # Initializing {}...
 
         # Tick counter
         self.counter = 0
@@ -79,7 +80,7 @@ class Strategy(StrategyBase):
         self.debt_asset = None
         self.check_bitasset_market()
 
-        self.log.info("{} initialized.".format(STRATEGY_NAME))
+        self.log.info(TS.king_of_the_hill[1].format(STRATEGY_NAME)) # {} initialized.
 
     @property
     def amount_quote(self):
@@ -155,29 +156,29 @@ class Strategy(StrategyBase):
                 is_partially_filled = self.is_partially_filled(order, threshold=self.partial_fill_threshold)
                 if is_partially_filled:
                     # If own order filled too much, replace it with new order
-                    self.log.info('Own {} order filled too much, resetting'.format(order_type))
+                    self.log.info(TS.king_of_the_hill[2].format(order_type)) # Own {} order filled too much, resetting
                     need_cancel = True
                 # Check if someone put order above ours or beaten order was canceled
                 elif order_type == 'buy':
                     diff = abs(order['price'] - self.top_buy_price)
                     if order['price'] < self.top_buy_price:
-                        self.log.debug('Detected an order above ours')
+                        self.log.debug(TS.king_of_the_hill[3]) # Detected an order above ours
                         need_cancel = True
                     elif diff > self.buy_gap:
-                        self.log.debug('Too much gap between our top buy order and next further order: %s', diff)
+                        self.log.debug(TS.king_of_the_hill[4], diff) # Too much gap between our top buy order and next further order: %s
                         need_cancel = True
                 elif order_type == 'sell':
                     diff = abs(order['price'] ** -1 - self.top_sell_price)
                     if order['price'] ** -1 > self.top_sell_price:
-                        self.log.debug('Detected an order above ours')
+                        self.log.debug(TS.king_of_the_hill[3]) # Detected an order above ours
                         need_cancel = True
                     elif diff > self.sell_gap:
-                        self.log.debug('Too much gap between our top sell order and further order: %s', diff)
+                        self.log.debug(TS.king_of_the_hill[5], diff) # Too much gap between our top sell order and further order: %s
                         need_cancel = True
 
             # Own order is not there
             else:
-                self.log.info('Own {} order filled, placing a new one'.format(order_type))
+                self.log.info(TS.king_of_the_hill[6].format(order_type)) # Own {} order filled, placing a new one
                 self.place_order(order_type)
 
             if need_cancel and self.cancel_orders(order):
@@ -207,13 +208,13 @@ class Strategy(StrategyBase):
                 self.top_sell_price = order['price']
                 if self.top_sell_price < self.lower_bound:
                     self.log.debug(
-                        'Top sell price to be higher {:.8f} < lower bound {:.8f}'.format(
+                        TS.king_of_the_hill[7].format(
                             self.top_sell_price, self.lower_bound
-                        )
+                        ) # Top sell price to be higher {:.8f} < lower bound {:.8f}
                     )
                     self.top_sell_price = self.lower_bound
                 else:
-                    self.log.debug('Top sell price to be higher: {:.8f}'.format(self.top_sell_price))
+                    self.log.debug(TS.king_of_the_hill[8].format(self.top_sell_price)) # Top sell price to be higher: {:.8f}
                 break
 
         for order in buy_orders:
@@ -221,30 +222,30 @@ class Strategy(StrategyBase):
                 self.top_buy_price = order['price']
                 if self.top_buy_price > self.upper_bound:
                     self.log.debug(
-                        'Top buy price to be higher {:.8f} > upper bound {:.8f}'.format(
+                        TS.king_of_the_hill[9].format(
                             self.top_buy_price, self.upper_bound
                         )
-                    )
+                    ) # Top buy price to be higher {:.8f} > upper bound {:.8f}
                     self.top_buy_price = self.upper_bound
                 else:
-                    self.log.debug('Top buy price to be higher: {:.8f}'.format(self.top_buy_price))
+                    self.log.debug(TS.king_of_the_hill[10].format(self.top_buy_price)) # Top buy price to be higher: {:.8f}
                 break
 
         if self.call_orders_expected:
             call_order = self.get_cumulative_call_order(self.debt_asset)
             if self.debt_asset == self.market['base'] and call_order['base']['amount'] > sell_order_size_threshold:
                 call_price = call_order['price'] ** -1
-                self.log.debug('Margin call on market {} at price {:.8f}'.format(self.worker['market'], call_price))
+                self.log.debug(TS.king_of_the_hill[11].format(self.worker['market'], call_price)) # Margin call on market {} at price {:.8f}
                 # If no orders on market, set price to Inf (default is 0 to indicate no orders
                 self.top_sell_price = self.top_sell_price or float('Inf')
                 if call_price < self.top_sell_price:
-                    self.log.debug('Correcting top sell price to {:.8f}'.format(call_price))
+                    self.log.debug(TS.king_of_the_hill[12].format(call_price)) # Correcting top sell price to {:.8f}
                     self.top_sell_price = call_price
             elif self.debt_asset == self.market['quote'] and call_order['base']['amount'] > buy_order_size_threshold:
                 call_price = call_order['price']
-                self.log.debug('Margin call on market {} at price {:.8f}'.format(self.worker['market'], call_price))
+                self.log.debug(TS.king_of_the_hill[11].format(self.worker['market'], call_price)) # Margin call on market {} at price {:.8f}
                 if call_price > self.top_buy_price:
-                    self.log.debug('Correcting top buy price to {:.8f}'.format(call_price))
+                    self.log.debug(TS.king_of_the_hill[13].format(call_price)) # Correcting top buy price to {:.8f}
                     self.top_buy_price = call_price
 
         # Fill top prices from orderbook because we need to keep in mind own orders too
@@ -254,7 +255,7 @@ class Strategy(StrategyBase):
             self.highest_bid = orderbook['bids'][0]['price']
             self.lowest_ask = orderbook['asks'][0]['price']
         except IndexError:
-            self.log.info('Market has empty orderbook')
+            self.log.info(TS.king_of_the_hill[14]) # Market has empty orderbook
 
     def get_cumulative_call_order(self, asset):
         """
@@ -299,17 +300,17 @@ class Strategy(StrategyBase):
 
         if order_type == 'buy':
             if not self.top_buy_price:
-                self.log.error('Cannot determine top buy price, correct your bounds and/or ignore thresholds')
+                self.log.error(TS.king_of_the_hill[15]) # Cannot determine top buy price, correct your bounds and/or ignore thresholds
                 self.disabled = True
                 return
 
             amount_base = Decimal(self.amount_base).quantize(Decimal(0).scaleb(-self.market['base']['precision']))
             if not amount_base:
                 if self.mode == 'both':
-                    self.log.debug('Not placing %s order in "both" mode due to insufficient balance', order_type)
+                    self.log.debug(TS.king_of_the_hill[16], order_type) # Not placing %s order in "both" mode due to insufficient balance
                 else:
                     self.log.error(
-                        'Cannot place {} order with 0 amount. Adjust your settings or add balance'.format(order_type)
+                        TS.king_of_the_hill[17].format(order_type) # Cannot place {} order with 0 amount. Adjust your settings or add balance
                     )
                 return False
 
@@ -328,33 +329,27 @@ class Strategy(StrategyBase):
 
             # Prevent too small amounts
             if self.is_too_small_amounts(amount_quote, amount_base):
-                self.log.error('Amount for {} order is too small'.format(order_type))
+                self.log.error(TS.king_of_the_hill[18].format(order_type)) # Amount for {} order is too small
                 return
 
             # Check crossing with opposite orders
             if price >= self.lowest_ask:
-                self.log.warning(
-                    'Cannot place top {} order because it will cross the opposite side; '
-                    'increase your order size to lower price step; my top price: {:.8f}, lowest ast: '
-                    '{:.8f}'.format(order_type, price, self.lowest_ask)
-                )
+                self.log.warning(TS.king_of_the_hill[19].format(order_type, price, self.lowest_ask)) # Cannot place top {} order because it will cross the opposite side; increase your order size to lower price step; my top price: {:.8f}, lowest ast: {:.8f}
                 return
 
             new_order = self.place_market_buy_order(float(amount_quote), float(price))
         elif order_type == 'sell':
             if not self.top_sell_price:
-                self.log.error('Cannot determine top sell price, correct your bounds and/or ignore thresholds')
+                self.log.error(TS.king_of_the_hill[20])
                 self.disabled = True
                 return
 
             amount_quote = Decimal(self.amount_quote).quantize(Decimal(0).scaleb(-self.market['quote']['precision']))
             if not amount_quote:
                 if self.mode == 'both':
-                    self.log.debug('Not placing %s order in "both" mode due to insufficient balance', order_type)
+                    self.log.debug(TS.king_of_the_hill[16], order_type) # Not placing %s order in "both" mode due to insufficient balance
                 else:
-                    self.log.error(
-                        'Cannot place {} order with 0 amount. Adjust your settings or add balance'.format(order_type)
-                    )
+                    self.log.error(TS.king_of_the_hill[17].format(order_type)) # Cannot place {} order with 0 amount. Adjust your settings or add balance
                 return False
 
             price = Decimal(self.top_sell_price)
@@ -371,15 +366,13 @@ class Strategy(StrategyBase):
 
             # Prevent too small amounts
             if self.is_too_small_amounts(amount_quote, amount_base):
-                self.log.error('Amount for {} order is too small'.format(order_type))
+                self.log.error(TS.king_of_the_hill[18].format(order_type)) # Amount for {} order is too small
                 return
 
             # Check crossing with opposite orders
             if price <= self.highest_bid:
                 self.log.warning(
-                    'Cannot place top {} order because it will cross the opposite side; '
-                    'increase your order size to lower price step; my top price: {:.8f}, highest bid: '
-                    '{:.8f}'.format(order_type, price, self.highest_bid)
+                    TS.king_of_the_hill[21].format(order_type, price, self.highest_bid) # Cannot place top {} order because it will cross the opposite side; increase your order size to lower price step; my top price: {:.8f}, highest bid: {:.8f}
                 )
                 return
 
@@ -393,7 +386,7 @@ class Strategy(StrategyBase):
             elif order_type == 'sell':
                 self.sell_gap = self.top_sell_price - new_order['price'] ** -1
         else:
-            self.log.error('Failed to place {} order'.format(order_type))
+            self.log.error(TS.king_of_the_hill[22].format(order_type)) # 
 
     def place_orders(self):
         """Place new orders."""

@@ -4,6 +4,7 @@
 # Project imports
 from .base import StrategyBase
 from .config_parts.strategy_config import StrategyConfig
+from dexbot.translator_strings import TranslatorStrings as TS
 
 # Third party imports
 # from bitshares.market import Market
@@ -57,7 +58,7 @@ class Strategy(StrategyBase):
         """ Using self.log.info() you can print text on the GUI to inform user on what is the bot currently doing. This
             is also written in the dexbot.log file.
         """
-        self.log.info("Initializing {}...".format(STRATEGY_NAME))
+        self.log.info(TS.strategy_template[0].format(STRATEGY_NAME)) # Initializing {}...
 
         # Tick counter
         self.counter = 0
@@ -100,7 +101,7 @@ class Strategy(StrategyBase):
         if self.view:
             self.update_gui_slider()
 
-        self.log.info("{} initialized.".format(STRATEGY_NAME))
+        self.log.info(TS.strategy_template[1].format(STRATEGY_NAME))
 
     def maintain_strategy(self):
         """
@@ -120,7 +121,7 @@ class Strategy(StrategyBase):
         Further documentation can be found from the function's documentation.
         """
         # Start writing strategy logic from here.
-        self.log.info("Starting {}".format(STRATEGY_NAME))
+        self.log.info(TS.strategy_template[2].format(STRATEGY_NAME))
 
     def check_orders(self, *args, **kwargs):
         """"""

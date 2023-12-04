@@ -10,7 +10,7 @@ from bitshares.dex import Dex
 from dexbot.decorators import check_last_run
 from dexbot.strategies.base import StrategyBase
 from dexbot.strategies.config_parts.staggered_config import StaggeredConfig
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class Strategy(StrategyBase):
     """Staggered Orders strategy."""
@@ -62,14 +62,11 @@ class Strategy(StrategyBase):
 
         fee_sum = self.market['base'].market_fee_percent + self.market['quote'].market_fee_percent
         if self.target_spread - self.increment <= fee_sum:
-            self.log.error(
-                'Spread must be greater than increment by at least {}, refusing to work because worker'
-                ' will make losses'.format(fee_sum)
-            )
+            self.log.error(TS.staggered_orders[0].format(fee_sum))
             self.disabled = True
 
         if self.operational_depth < 2:
-            self.log.error('Operational depth should be at least 2 orders')
+            self.log.error(TS.staggered_orders[1])
             self.disabled = True
 
         # Strategy variables
@@ -136,7 +133,7 @@ class Strategy(StrategyBase):
 
         # Set center price to manual value if needed. Manual center price works only when there are no orders
         if self.center_price and not (self.buy_orders or self.sell_orders):
-            self.log.debug('Using manual center price because of no sell or buy orders')
+            self.log.debug(TS.staggered_orders[2])
             self.market_center_price = self.center_price
 
         # On empty market we need manual center price anyway
@@ -145,7 +142,7 @@ class Strategy(StrategyBase):
                 self.market_center_price = self.center_price
             else:
                 # Still not have market_center_price? Empty market, don't continue
-                self.log.warning('Cannot calculate center price on empty market, please set it manually')
+                self.log.warning(TS.staggered_orders[3])
                 return
 
         # Calculate balances, and use orders from previous call of self.refresh_orders() to reduce API calls
@@ -165,7 +162,7 @@ class Strategy(StrategyBase):
             self.restore_virtual_orders()
 
             if self.virtual_orders_restored:
-                self.log.info('Virtual orders restored')
+                self.log.info(TS.staggered_orders[4])
                 return
 
         # Ensure proper operational depth
@@ -213,7 +210,7 @@ class Strategy(StrategyBase):
             except TypeError:
                 # For some reason 'operation_results' may be None, this should not fail us
                 order_ids = []
-            self.log.debug('Placed orders: %s', order_ids)
+            self.log.debug(TS.staggered_orders[5], order_ids)
             self.refresh_orders()
             self.sync_current_orders()
 
@@ -240,9 +237,7 @@ class Strategy(StrategyBase):
             and self.quote_balance_history[1] == self.quote_balance_history[2]
         ):
             # Balance didn't changed, so we can reduce maintenance frequency
-            self.log.debug(
-                'Raising check interval up to {} seconds to reduce CPU usage'.format(self.max_check_interval)
-            )
+            self.log.debug(TS.staggered_orders[6].format(self.max_check_interval))
             self.check_interval = self.max_check_interval
         elif self.check_interval == self.max_check_interval and (
             self.base_balance_history[1] != self.base_balance_history[2]
@@ -250,7 +245,7 @@ class Strategy(StrategyBase):
         ):
             # Balance changed, increase maintenance frequency to allocate more quickly
             self.log.debug(
-                'Reducing check interval to {} seconds because of changed ' 'balances'.format(self.min_check_interval)
+                TS.staggered_orders[7].format(self.min_check_interval)
             )
             self.check_interval = self.min_check_interval
 
@@ -280,10 +275,7 @@ class Strategy(StrategyBase):
             return
         elif self.buy_orders:
             # If target spread is not reached and no balance to allocate, cancel lowest buy order
-            self.log.info(
-                'Free balances are not changing, bootstrap is off and target spread is not reached. '
-                'Cancelling lowest buy order as a fallback'
-            )
+            self.log.info(TS.staggered_orders[8])
             self.cancel_orders_wrapper(self.buy_orders[-1])
 
         # Update profit estimate
@@ -328,7 +320,7 @@ class Strategy(StrategyBase):
         amount = self.quote_total_balance * self.stop_loss_amount
         self.cancel_all_orders()
         self.log.warning(
-            'Executing Stop Loss, selling {:.{prec}f} {} @ {:.8f}'.format(
+            TS.staggered_orders[9].format(
                 amount, self.market['quote']['symbol'], stop_loss_price, prec=self.market['quote']['precision']
             )
         )
@@ -370,7 +362,7 @@ class Strategy(StrategyBase):
         if op_percent_quote < 1:
             op_quote_balance *= op_percent_quote
             self.log.debug(
-                'Using {:.2%} of QUOTE balance ({:.{prec}f} {})'.format(
+                TS.staggered_orders[10].format(
                     op_percent_quote,
                     op_quote_balance,
                     self.market['quote']['symbol'],
@@ -380,7 +372,7 @@ class Strategy(StrategyBase):
         if op_percent_base < 1:
             op_base_balance *= op_percent_base
             self.log.debug(
-                'Using {:.2%} of BASE balance ({:.{prec}f} {})'.format(
+                TS.staggered_orders[11].format(
                     op_percent_base,
                     op_base_balance,
                     self.market['base']['symbol'],
@@ -465,7 +457,7 @@ class Strategy(StrategyBase):
         """Save orders after initial placement for later use (visualization and so on)"""
         self.refresh_orders()
         orders = self.buy_orders + self.sell_orders
-        self.log.info('Dumping initial orders into db')
+        self.log.info(TS.staggered_orders[12])
         # Ids should be changed to avoid ids intersection with "current" orders
         for order in orders:
             order['id'] = str(uuid.uuid4())
@@ -476,7 +468,7 @@ class Strategy(StrategyBase):
 
     def drop_initial_orders(self):
         """Drop old "initial" orders from the db."""
-        self.log.debug('Removing initial orders from the db')
+        self.log.debug(TS.staggered_orders[13])
         self.clear_orders_extended(custom='initial')
 
     def remove_outside_orders(self, sell_orders, buy_orders):
@@ -492,14 +484,14 @@ class Strategy(StrategyBase):
         for order in sell_orders:
             order_price = order['price'] ** -1
             if order_price > self.upper_bound:
-                self.log.info('Cancelling sell order outside range: {:.8f}'.format(order_price))
+                self.log.info(TS.staggered_orders[14].format(order_price))
                 orders_to_cancel.append(order)
 
         # Remove buy orders that exceed boundaries
         for order in buy_orders:
             order_price = order['price']
             if order_price < self.lower_bound:
-                self.log.info('Cancelling buy order outside range: {:.8f}'.format(order_price))
+                self.log.info(TS.staggered_orders[15].format(order_price))
                 orders_to_cancel.append(order)
 
         if orders_to_cancel:
@@ -511,7 +503,7 @@ class Strategy(StrategyBase):
             if success:
                 return True
             else:
-                self.log.debug('Batch cancel failed, failing back to cancelling single order')
+                self.log.debug(TS.staggered_orders[16])
                 self.cancel_orders_wrapper(orders_to_cancel[0])
                 # To avoid GUI hanging cancel only one order and let switch to another worker
                 return False
@@ -550,38 +542,38 @@ class Strategy(StrategyBase):
 
         if not self.buy_orders and not self.sell_orders:
             # No real orders, assume we need to bootstrap, purge old orders
-            self.log.info('No real orders, purging old virtual orders')
+            self.log.info(TS.staggered_orders[17])
             self.clear_orders_extended(custom='current')
         elif self.buy_orders and self.sell_orders:
             if stored_orders:
-                self.log.info('Loading virtual orders from database')
+                self.log.info(TS.staggered_orders[18])
                 for order in stored_orders:
                     self.virtual_orders.append(VirtualOrder(order))
             else:
-                self.log.info('Recreating virtual orders')
+                self.log.info(TS.staggered_orders[19])
                 place_further_buy_orders()
                 place_further_sell_orders()
         elif self.buy_orders and not self.sell_orders:
             # Only buy orders, purge stored sell orders
             if stored_sell_orders:
-                self.log.info('Purging virtual sell orders because of no real sell orders')
+                self.log.info(TS.staggered_orders[20])
                 for order in stored_sell_orders:
                     self.remove_order(order)
 
             if stored_buy_orders:
-                self.log.info('Loading virtual buy orders from database')
+                self.log.info(TS.staggered_orders[21])
                 for order in stored_buy_orders:
                     self.virtual_orders.append(VirtualOrder(order))
             else:
                 place_further_buy_orders()
         elif not self.buy_orders and self.sell_orders:
             if stored_buy_orders:
-                self.log.info('Purging virtual buy orders because of no real buy orders')
+                self.log.info(TS.staggered_orders[22])
                 for order in stored_buy_orders:
                     self.remove_order(order)
 
             if stored_sell_orders:
-                self.log.info('Loading virtual sell orders from database')
+                self.log.info(TS.staggered_orders[23])
                 for order in stored_sell_orders:
                     self.virtual_orders.append(VirtualOrder(order))
             else:
@@ -637,12 +629,12 @@ class Strategy(StrategyBase):
         if success and order['base']['symbol'] == self.market['base']['symbol']:
             quote_amount = order['quote']['amount']
             price = order['price']
-            self.log.info('Replacing real buy order with virtual')
+            self.log.info(TS.staggered_orders[24])
             self.place_virtual_buy_order(quote_amount, price)
         elif success and order['base']['symbol'] == self.market['quote']['symbol']:
             quote_amount = order['base']['amount']
             price = order['price'] ** -1
-            self.log.info('Replacing real sell order with virtual')
+            self.log.info(TS.staggered_orders[25])
             self.place_virtual_sell_order(quote_amount, price)
         else:
             return False
@@ -663,20 +655,20 @@ class Strategy(StrategyBase):
         if order['base']['symbol'] == self.market['base']['symbol']:
             quote_amount = order['quote']['amount']
             price = order['price']
-            self.log.info('Replacing virtual buy order with real order')
+            self.log.info(TS.staggered_orders[26])
             try:
                 new_order = self.place_market_buy_order(quote_amount, price, returnOrderId=True)
             except bitsharesapi.exceptions.RPCError:
-                self.log.exception('Error broadcasting trx:')
+                self.log.exception(TS.staggered_orders[27])
                 return False
         else:
             quote_amount = order['base']['amount']
             price = order['price'] ** -1
-            self.log.info('Replacing virtual sell order with real order')
+            self.log.info(TS.staggered_orders[28])
             try:
                 new_order = self.place_market_sell_order(quote_amount, price, returnOrderId=True)
             except bitsharesapi.exceptions.RPCError:
-                self.log.exception('Error broadcasting trx:')
+                self.log.exception(TS.staggered_orders[27])
                 return False
 
         if new_order:
@@ -711,12 +703,12 @@ class Strategy(StrategyBase):
             # Check if center price changed more than increment
             diff = abs(self.old_center_price - self.market_center_price) / self.old_center_price
             if diff > self.increment:
-                self.log.debug('Center price change is {:.2%}, need to store balance data'.format(diff))
+                self.log.debug(TS.staggered_orders[29].format(diff))
                 need_store = True
 
         if need_store and self.market_center_price:
             timestamp = time.time()
-            self.log.debug('Storing balance data at center price {:.8f}'.format(self.market_center_price))
+            self.log.debug(TS.staggered_orders[30].format(self.market_center_price))
             self.store_balance_entry(
                 account,
                 self.worker_name,
@@ -737,7 +729,7 @@ class Strategy(StrategyBase):
         :param str | asset: 'base' or 'quote'
         :param Amount | asset_balance: Amount of the asset available to use
         """
-        self.log.debug('Need to allocate {}: {}'.format(asset, asset_balance))
+        self.log.debug(TS.staggered_orders[31].format(asset, asset_balance))
         closest_opposite_order = None
         closest_opposite_price = 0
         opposite_asset_limit = None
@@ -812,10 +804,7 @@ class Strategy(StrategyBase):
                     and opposite_orders
                 ):
                     # Turn off bootstrap mode whether we're didn't allocated assets during previous 3 maintenance
-                    self.log.debug(
-                        'Turning bootstrapping off: actual_spread > target_spread, we have free '
-                        'balances and cannot allocate them normally 3 times in a row'
-                    )
+                    self.log.debug(TS.staggered_orders[32])
                     self['bootstrapping'] = False
 
                 """ Note: because we're using operations batching, there is possible a situation when we will have
@@ -829,7 +818,7 @@ class Strategy(StrategyBase):
 
                 # Place order closer to the center price
                 self.log.debug(
-                    'Placing closer {} order; actual spread: {:.4%}, target + increment: {:.4%}'.format(
+                    TS.staggered_orders[33].format(
                         order_type, actual_spread, self.target_spread + self.increment
                     )
                 )
@@ -852,9 +841,9 @@ class Strategy(StrategyBase):
 
                     try:
                         opposite_order = opposite_orders[0]
-                        self.log.debug('Using stored opposite order')
+                        self.log.debug(TS.staggered_orders[34])
                     except IndexError:
-                        self.log.debug('Using real opposite order')
+                        self.log.debug(TS.staggered_orders[35])
                         opposite_order = closest_opposite_order
 
                     if (
@@ -865,7 +854,7 @@ class Strategy(StrategyBase):
                         opposite_asset_limit = None
                         own_asset_limit = opposite_order['quote']['amount']
                         self.log.debug(
-                            'Limiting {} order by opposite order: {:.{prec}f} {}'.format(
+                            TS.staggered_orders[36].format(
                                 order_type, own_asset_limit, own_symbol, prec=own_precision
                             )
                         )
@@ -878,7 +867,7 @@ class Strategy(StrategyBase):
                         opposite_asset_limit = opposite_order['base']['amount']
                         own_asset_limit = None
                         self.log.debug(
-                            'Limiting {} order by opposite order: {:.{prec}f} {}'.format(
+                            TS.staggered_orders[36].format(
                                 order_type, opposite_asset_limit, opposite_symbol, prec=opposite_precision
                             )
                         )
@@ -907,10 +896,7 @@ class Strategy(StrategyBase):
                     """Detect partially filled order on the own side and reserve funds to replace order in case opposite
                     order will be fully filled."""
                     funds_to_reserve = closest_own_order['base']['amount']
-                    self.log.debug(
-                        'Partially filled order on own side, reserving funds to replace: '
-                        '{:.{prec}f} {}'.format(funds_to_reserve, own_symbol, prec=own_precision)
-                    )
+                    self.log.debug(TS.staggered_orders[37].format(funds_to_reserve, own_symbol, prec=own_precision))
                     asset_balance -= funds_to_reserve
 
                 if not self.check_partial_fill(closest_opposite_order, fill_threshold=0):
@@ -929,10 +915,7 @@ class Strategy(StrategyBase):
                         funds_to_reserve = closer_own_order['amount'] * closer_own_order['price'] * additional_reserve
                     elif asset == 'quote':
                         funds_to_reserve = closer_own_order['amount'] * additional_reserve
-                    self.log.debug(
-                        'Partially filled order on opposite side, reserving funds for next {} order: '
-                        '{:.{prec}f} {}'.format(order_type, funds_to_reserve, own_symbol, prec=own_precision)
-                    )
+                    self.log.debug(TS.staggered_orders[38].format(order_type, funds_to_reserve, own_symbol, prec=own_precision))
                     asset_balance -= funds_to_reserve
 
                 if asset_balance > own_threshold:
@@ -942,12 +925,12 @@ class Strategy(StrategyBase):
                     ):
                         # Lower/upper bound has been reached and now will start allocating rest of the balance.
                         self['bootstrapping'] = False
-                        self.log.debug('Increasing sizes of {} orders'.format(order_type))
+                        self.log.debug(TS.staggered_orders[39].format(order_type))
                         increase_status = self.increase_order_sizes(asset, asset_balance, own_orders)
                     else:
                         # Range bound is not reached, we need to add additional orders at the extremes
                         self['bootstrapping'] = False
-                        self.log.debug('Placing further order than current furthest {} order'.format(order_type))
+                        self.log.debug(TS.staggered_orders[40].format(order_type))
                         self.place_further_order(asset, furthest_own_order, allow_partial=True)
                 else:
                     increase_status = 'done'
@@ -980,7 +963,7 @@ class Strategy(StrategyBase):
                 # Require empty txbuffer to avoid rare condition when order may be already canceled from
                 # replace_partially_filled_order() call.
                 # Note: we cannot use such check for own side because we will not have the balance to allocate
-                self.log.info('Cancelling dust order at opposite side, placing closer {} order'.format(order_type))
+                self.log.info(TS.staggered_orders[41].format(order_type))
                 previous_bundle = self.bitshares.bundle
                 self.bitshares.bundle = False
                 self.cancel_orders_wrapper(closest_opposite_order)
@@ -994,7 +977,7 @@ class Strategy(StrategyBase):
                 self['bootstrapping'] = True
                 self.drop_initial_orders()
             order = None
-            self.log.debug('Placing first {} order'.format(order_type))
+            self.log.debug(TS.staggered_orders[42].format(order_type))
             if asset == 'base':
                 order = self.place_lowest_buy_order(asset_balance)
             elif asset == 'quote':
@@ -1055,7 +1038,7 @@ class Strategy(StrategyBase):
         if asset_balance < needed_balance:
             # Balance should be enough to replace partially filled order
             self.log.debug(
-                'Not enough balance to increase {} order at price {:.8f}: {:.{prec}f}/{:.{prec}f} {}'.format(
+                TS.staggered_orders[43].format(
                     order_type, price, asset_balance['amount'], needed_balance, symbol, prec=precision
                 )
             )
@@ -1067,7 +1050,7 @@ class Strategy(StrategyBase):
             return True
 
         self.log.debug(
-            'Pre-increasing {} order at price {:.8f} from {:.{prec}f} to {:.{prec}f} {}'.format(
+            TS.staggered_orders[44].format(
                 order_type, price, order_amount, new_order_amount, symbol, prec=precision
             )
         )
@@ -1450,8 +1433,7 @@ class Strategy(StrategyBase):
                 old_opposite_amount = orders[index]['quote']['amount']
                 new_opposite_amount = order['quote']['amount']
                 self.log.info(
-                    'Increasing {} order at price {:.8f}: {:.{prec}f} -> {:.{prec}f} {} '
-                    '({:.{opposite_prec}f} -> {:.{opposite_prec}f} {})'.format(
+                    TS.staggered_orders[45].format(
                         order_type,
                         price,
                         old_amount,
@@ -1465,7 +1447,7 @@ class Strategy(StrategyBase):
                     )
                 )
                 self.log.debug(
-                    'Cancelling {} order in increase_order_sizes(); mode: {}, amount: {}, price: {:.8f}'.format(
+                    TS.staggered_orders[46].format(
                         order_type, self.mode, old_amount, price
                     )
                 )
@@ -1517,7 +1499,7 @@ class Strategy(StrategyBase):
             diff_rel = diff_abs / order['base']['amount']
             if diff_rel > fill_threshold:
                 self.log.debug(
-                    'Partially filled {} order: {} {} @ {:.8f}, filled: {:.2%}'.format(
+                    TS.staggered_orders[47].format(
                         order_type, order['base']['amount'], order['base']['symbol'], price, diff_rel
                     )
                 )
@@ -1543,7 +1525,7 @@ class Strategy(StrategyBase):
         # Make sure we have enough balance to replace partially filled order
         if asset_balance + order['for_sale']['amount'] >= order['base']['amount']:
             # Cancel closest order and immediately replace it with new one.
-            self.log.info('Replacing partially filled {} order'.format(order_type))
+            self.log.info(TS.staggered_orders[48].format(order_type))
             self.cancel_orders_wrapper(order)
             if order_type == 'buy':
                 self.place_market_buy_order(order['quote']['amount'], order['price'])
@@ -1555,7 +1537,7 @@ class Strategy(StrategyBase):
         else:
             needed = order['base']['amount'] - order['for_sale']['amount']
             self.log.debug(
-                'Unable to replace partially filled {} order: avail/needed: {:.{prec}f}/{:.{prec}f} {}'.format(
+                TS.staggered_orders[49].format(
                     order_type, asset_balance['amount'], needed, order['base']['symbol'], prec=precision
                 )
             )
@@ -1574,7 +1556,7 @@ class Strategy(StrategyBase):
         :param float | opposite_asset_limit: order should be limited in size by order's "quote" amount
         """
         if own_asset_limit and opposite_asset_limit:
-            self.log.error('Only own_asset_limit or opposite_asset_limit should be specified')
+            self.log.error(TS.staggered_orders[50])
             self.disabled = True
             return None
 
@@ -1601,19 +1583,19 @@ class Strategy(StrategyBase):
             price = order['price'] * (1 + self.increment)
             lowest_ask = float(self.ticker().get('lowestAsk'))
             if not self.is_instant_fill_enabled and price > lowest_ask and lowest_ask > 0 and place_order:
-                self.log.info('Refusing to place an order which crosses lowest ask')
+                self.log.info(TS.staggered_orders[51])
                 return None
             if price > self.upper_bound:
-                self.log.warning('Refusing to place buy order which crosses upper bound')
+                self.log.warning(TS.staggered_orders[52])
                 return None
         elif asset == 'quote':
             price = (order['price'] ** -1) / (1 + self.increment)
             highest_bid = float(self.ticker().get('highestBid'))
             if not self.is_instant_fill_enabled and price < highest_bid and highest_bid > 0 and place_order:
-                self.log.info('Refusing to place an order which crosses highest bid')
+                self.log.info(TS.staggered_orders[53])
                 return None
             if price < self.lower_bound:
-                self.log.warning('Refusing to place sell order which crosses lower bound')
+                self.log.warning(TS.staggered_orders[54])
                 return None
 
         # For next steps we do not need inverted price for sell orders
@@ -1668,7 +1650,7 @@ class Strategy(StrategyBase):
                 and missing / limiter < 0.05
             ):
                 self.log.debug(
-                    'Limiting {} order amount to available asset balance: {:.{prec}f} {}'.format(
+                    TS.staggered_orders[55].format(
                         order_type, balance, symbol, prec=precision
                     )
                 )
@@ -1678,7 +1660,7 @@ class Strategy(StrategyBase):
                     quote_amount = balance
             elif place_order and not allow_partial:
                 self.log.debug(
-                    'Not enough balance to place closer {} order; need/avail: {:.{prec}f}/{:.{prec}f}'.format(
+                    TS.staggered_orders[56].format(
                         order_type, limiter, balance, prec=precision
                     )
                 )
@@ -1689,7 +1671,7 @@ class Strategy(StrategyBase):
         if place_order:
             corrected_quote_amount = self.check_min_order_size(quote_amount, price)
             if corrected_quote_amount > quote_amount:
-                self.log.debug('Correcting closer order amount to minimal allowed')
+                self.log.debug(TS.staggered_orders[57])
                 quote_amount = corrected_quote_amount
                 base_amount = quote_amount * price
                 if asset == 'base':
@@ -1698,7 +1680,7 @@ class Strategy(StrategyBase):
                     hard_limit = quote_amount
             if balance < hard_limit:
                 self.log.debug(
-                    'Not enough balance to place minimal allowed order: {:.{prec}f}/{:.{prec}f} {}'.format(
+                    TS.staggered_orders[58].format(
                         balance, hard_limit, symbol, prec=precision
                     )
                 )
@@ -1709,19 +1691,19 @@ class Strategy(StrategyBase):
             orders_count = self.calc_buy_orders_count(virtual_bound, price)
             if orders_count > self.operational_depth and isinstance(order, VirtualOrder):
                 # Allow to place closer order only if current is virtual
-                self.log.info('Placing virtual closer buy order')
+                self.log.info(TS.staggered_orders[59])
                 new_order = self.place_virtual_buy_order(quote_amount, price)
             else:
-                self.log.info('Placing closer buy order')
+                self.log.info(TS.staggered_orders[60])
                 new_order = self.place_market_buy_order(quote_amount, price)
         elif place_order and asset == 'quote':
             virtual_bound = self.market_center_price * math.sqrt(1 + self.target_spread)
             orders_count = self.calc_sell_orders_count(virtual_bound, price)
             if orders_count > self.operational_depth and isinstance(order, VirtualOrder):
-                self.log.info('Placing virtual closer sell order')
+                self.log.info(TS.staggered_orders[61])
                 new_order = self.place_virtual_sell_order(quote_amount, price)
             else:
-                self.log.info('Placing closer sell order')
+                self.log.info(TS.staggered_orders[62])
                 new_order = self.place_market_sell_order(quote_amount, price)
         else:
             new_order = {"amount": quote_amount, "price": price}
@@ -1794,14 +1776,14 @@ class Strategy(StrategyBase):
         if balance < limiter:
             if place_order and not allow_partial:
                 self.log.debug(
-                    'Not enough balance to place further {} order; need/avail: {:.{prec}f}/{:.{prec}f}'.format(
+                    TS.staggered_orders[63].format(
                         order_type, limiter, balance, prec=precision
                     )
                 )
                 place_order = False
             elif allow_partial:
                 self.log.debug(
-                    'Limiting {} order amount to available asset balance: {:.{prec}f} {}'.format(
+                    TS.staggered_orders[55].format(
                         order_type, balance, symbol, prec=precision
                     )
                 )
@@ -1815,7 +1797,7 @@ class Strategy(StrategyBase):
         if place_order:
             corrected_quote_amount = self.check_min_order_size(quote_amount, price)
             if corrected_quote_amount > quote_amount:
-                self.log.debug('Correcting further order amount to minimal allowed')
+                self.log.debug(TS.staggered_orders[64])
                 quote_amount = corrected_quote_amount
                 base_amount = quote_amount * price
                 if asset == 'base':
@@ -1824,7 +1806,7 @@ class Strategy(StrategyBase):
                     hard_limit = quote_amount
             if balance < hard_limit:
                 self.log.debug(
-                    'Not enough balance to place minimal allowed order: {:.{prec}f}/{:.{prec}f} {}'.format(
+                    TS.staggered_orders[55].format(
                         balance, hard_limit, symbol, prec=precision
                     )
                 )
@@ -1833,18 +1815,18 @@ class Strategy(StrategyBase):
         if place_order and asset == 'base':
             orders_count = self.calc_buy_orders_count(virtual_bound, price)
             if orders_count > self.operational_depth or virtual:
-                self.log.info('Placing virtual further buy order')
+                self.log.info(TS.staggered_orders[65])
                 new_order = self.place_virtual_buy_order(quote_amount, price)
             else:
-                self.log.info('Placing further buy order')
+                self.log.info(TS.staggered_orders[66])
                 new_order = self.place_market_buy_order(quote_amount, price)
         elif place_order and asset == 'quote':
             orders_count = self.calc_sell_orders_count(virtual_bound, price)
             if orders_count > self.operational_depth or virtual:
-                self.log.info('Placing virtual further sell order')
+                self.log.info(TS.staggered_orders[67])
                 new_order = self.place_virtual_sell_order(quote_amount, price)
             else:
-                self.log.info('Placing further sell order')
+                self.log.info(TS.staggered_orders[68])
                 new_order = self.place_market_sell_order(quote_amount, price)
         else:
             new_order = {"amount": quote_amount, "price": price}
@@ -1867,8 +1849,7 @@ class Strategy(StrategyBase):
 
         if price > self.upper_bound:
             self.log.info(
-                'Not placing highest sell order because price will exceed higher bound. Market center '
-                'price: {:.8f}, closest order price: {:.8f}, upper_bound: {:.8f}'.format(
+                TS.staggered_orders[69].format(
                     market_center_price, price, self.upper_bound
                 )
             )
@@ -1937,10 +1918,10 @@ class Strategy(StrategyBase):
             corrected_amount = self.check_min_order_size(amount_quote, price)
             if corrected_amount > amount_quote:
                 if quote_balance >= corrected_amount:
-                    self.log.warning('Placing increased order because calculated size is less than allowed minimum')
+                    self.log.warning(TS.staggered_orders[70])
                     amount_quote = corrected_amount
                 else:
-                    self.log.debug('Insufficient balance to place sell order')
+                    self.log.debug(TS.staggered_orders[71])
                     return
 
             if sell_orders_count > self.operational_depth:
@@ -1998,8 +1979,7 @@ class Strategy(StrategyBase):
 
         if price < self.lower_bound:
             self.log.info(
-                'Not placing lowest buy order because price will exceed lower bound. Market center price: '
-                '{:.8f}, closest order price: {:.8f}, lower bound: {:.8f}'.format(
+                TS.staggered_orders[72].format(
                     market_center_price, price, self.lower_bound
                 )
             )
@@ -2071,10 +2051,10 @@ class Strategy(StrategyBase):
             corrected_amount = self.check_min_order_size(amount_quote, price)
             if corrected_amount > amount_quote:
                 if base_balance >= corrected_amount:
-                    self.log.warning('Placing increased order because calculated size is less than allowed minimum')
+                    self.log.warning(TS.staggered_orders[70])
                     amount_quote = corrected_amount
                 else:
-                    self.log.debug('Insufficient balance to place buy order')
+                    self.log.debug(TS.staggered_orders[73])
                     return
 
             if buy_orders_count > self.operational_depth:
@@ -2128,7 +2108,7 @@ class Strategy(StrategyBase):
 
         if amount < self.order_min_quote or amount * price < self.order_min_base:
             self.log.debug(
-                'Too small order, base: {:.8f}/{:.8f}, quote: {}/{}'.format(
+                TS.staggered_orders[74].format(
                     amount * price, self.order_min_base, amount, self.order_min_quote
                 )
             )
@@ -2158,7 +2138,7 @@ class Strategy(StrategyBase):
         order['price'] = precise_base_amount / precise_quote_amount
 
         self.log.info(
-            'Placing a virtual buy order with {:.{prec}f} {} @ {:.8f}'.format(
+            TS.staggered_orders[75].format(
                 order['base']['amount'], symbol, order['price'], prec=self.market['base']['precision']
             )
         )
@@ -2194,7 +2174,7 @@ class Strategy(StrategyBase):
         order['price'] = precise_base_amount / precise_quote_amount
 
         self.log.info(
-            'Placing a virtual sell order with {:.{prec}f} {} @ {:.8f}'.format(
+            TS.staggered_orders[76].format(
                 amount, symbol, order['price'] ** -1, prec=self.market['quote']['precision']
             )
         )

@@ -19,6 +19,8 @@ from dexbot.config import Config
 from dexbot.helper import truncate
 from dexbot.storage import Storage
 
+from dexbot.translator_strings import TranslatorStrings as TS
+
 # Number of maximum retries used to retry action before failing
 MAX_TRIES = 3
 
@@ -132,10 +134,10 @@ class BitsharesOrderEngine(Storage, Events):
                 self.bitshares.txbuffer.clear()
                 return False
             else:
-                self.log.exception("Unable to cancel order")
+                self.log.exception(TS.bitshares_engine[0]) # Unable to cancel order
                 return False
         except bitshares.exceptions.MissingKeyError:
-            self.log.exception('Unable to cancel order(s), private key missing.')
+            self.log.exception(TS.bitshares_engine[1]) # Unable to cancel order(s), private key missing.
             return False
 
         return True
@@ -250,20 +252,20 @@ class BitsharesOrderEngine(Storage, Events):
         orders_to_cancel = []
 
         if all_markets:
-            self.log.info('Canceling all account orders')
+            self.log.info(TS.bitshares_engine[2]) # Canceling all account orders
             orders_to_cancel = self.all_own_orders
         else:
             self.log.info(
-                'Canceling all orders on market {}/{}'.format(
+                TS.bitshares_engine[3].format(
                     self.market['quote']['symbol'], self.market['base']['symbol']
                 )
-            )
+            ) # Canceling all orders on market {}/{}
             orders_to_cancel = self.own_orders
 
         if orders_to_cancel:
             self.cancel_orders(orders_to_cancel)
 
-        self.log.info("Orders canceled")
+        self.log.info(TS.bitshares_engine[4]) # Orders canceled
 
     def cancel_orders(self, orders, batch_only=False):
         """
@@ -574,18 +576,18 @@ class BitsharesOrderEngine(Storage, Events):
 
         # Don't try to place an order of size 0
         if not base_amount:
-            self.log.critical('Trying to buy 0')
+            self.log.critical(TS.bitshares_engine[5]) # Trying to buy 0
             self.disabled = True
             return None
 
         # Make sure we have enough balance for the order
         if return_order_id and self.balance(self._market['base']) < base_amount:
-            self.log.critical("Insufficient buy balance, needed {} {}".format(base_amount, symbol))
+            self.log.critical(TS.bitshares_engine[6].format(base_amount, symbol)) # Insufficient buy balance
             self.disabled = True
             return None
 
         self.log.info(
-            'Placing a buy order with {:.{prec}f} {} @ {:.8f}'.format(base_amount, symbol, price, prec=precision)
+            TS.bitshares_engine[7].format(base_amount, symbol, price, prec=precision) # Placing a buy order with
         )
 
         # Place the order
@@ -601,7 +603,7 @@ class BitsharesOrderEngine(Storage, Events):
             **kwargs
         )
 
-        self.log.debug('Placed buy order {}'.format(buy_transaction))
+        self.log.debug(TS.bitshares_engine[8].format(buy_transaction)) # Placed buy order
         if return_order_id:
             buy_order = self.get_order(buy_transaction['orderid'], return_none=return_none)
             if buy_order and buy_order['deleted']:
@@ -633,18 +635,18 @@ class BitsharesOrderEngine(Storage, Events):
 
         # Don't try to place an order of size 0
         if not quote_amount:
-            self.log.critical('Trying to sell 0')
+            self.log.critical(TS.bitshares_engine[9]) # Trying to sell 0
             self.disabled = True
             return None
 
         # Make sure we have enough balance for the order
         if return_order_id and self.balance(self._market['quote']) < quote_amount:
-            self.log.critical("Insufficient sell balance, needed {} {}".format(amount, symbol))
+            self.log.critical(TS.bitshares_engine[10].format(amount, symbol)) # Insufficient sell balance
             self.disabled = True
             return None
 
         self.log.info(
-            'Placing a sell order with {:.{prec}f} {} @ {:.8f}'.format(quote_amount, symbol, price, prec=precision)
+            TS.bitshares_engine[11].format(quote_amount, symbol, price, prec=precision) # Placing a sell order
         )
 
         # Place the order
@@ -660,7 +662,7 @@ class BitsharesOrderEngine(Storage, Events):
             **kwargs
         )
 
-        self.log.debug('Placed sell order {}'.format(sell_transaction))
+        self.log.debug(TS.bitshares_engine[12].format(sell_transaction)) # Placed sell order
         if return_order_id:
             sell_order = self.get_order(sell_transaction['orderid'], return_none=return_none)
             if sell_order and sell_order['deleted']:
@@ -688,7 +690,7 @@ class BitsharesOrderEngine(Storage, Events):
             try:
                 ref_block = self.bitshares.txbuffer.get("ref_block_num")
                 ref_block_prefix = self.bitshares.txbuffer.get("ref_block_prefix")
-                self.log.debug('Ref block num: {}, prefix: {}'.format(ref_block, ref_block_prefix))
+                self.log.debug(TS.bitshares_engine[13].format(ref_block, ref_block_prefix)) # Ref block num: {}, prefix: {}
                 return action(*args, **kwargs)
             except bitsharesapi.exceptions.UnhandledRPCError as exception:
                 if "Assert Exception: amount_to_sell.amount > 0" in str(exception):
@@ -696,7 +698,7 @@ class BitsharesOrderEngine(Storage, Events):
                         raise
                     else:
                         tries += 1
-                        self.log.warning("Ignoring: '{}'".format(str(exception)))
+                        self.log.warning(TS.bitshares_engine[14].format(str(exception))) # Ignoring: '{}'
                         self.bitshares.txbuffer.clear()
                         self._account.refresh()
                         time.sleep(2)
@@ -705,27 +707,24 @@ class BitsharesOrderEngine(Storage, Events):
                         raise
                     else:
                         tries += 1
-                        self.log.warning("retrying on '{}'".format(str(exception)))
+                        self.log.warning(TS.bitshares_engine[15].format(str(exception))) # retrying on '{}'
                         self.bitshares.txbuffer.clear()
                         time.sleep(6)  # Wait at least a BitShares block
                 elif "trx.expiration <= now + chain_parameters.maximum_time_until_expiration" in str(exception):
                     if tries > MAX_TRIES:
                         info = self.bitshares.info()
                         raise Exception(
-                            'Too much difference between node block time and trx expiration, please change '
-                            'the node. Block time: {}, local time: {}'.format(
+                            TS.bitshares_engine[16].format( # Too much difference between node block time and trx expiration
                                 info['time'], formatTime(datetime.datetime.utcnow())
                             )
                         )
                     else:
                         tries += 1
-                        self.log.warning(
-                            'Too much difference between node block time and trx expiration, switching node'
-                        )
+                        self.log.warning(TS.bitshares_engine[17]) # Too much difference between node block time and trx expiration, switching node
                         self.bitshares.txbuffer.clear()
                         self.bitshares.rpc.next()
                 elif "Assert Exception: delta.amount > 0: Insufficient Balance" in str(exception):
-                    self.log.critical('Insufficient balance of fee asset')
+                    self.log.critical(TS.bitshares_engine[18]) # Insufficient balance of fee asset
                     raise
                 elif "trx.ref_block_prefix == tapos_block_summary.block_id._hash" in str(exception):
                     if tries > MAX_TRIES:
@@ -733,12 +732,12 @@ class BitsharesOrderEngine(Storage, Events):
                     else:
                         # TODO: move node switch to a function
                         old = self.bitshares.rpc.url
-                        self.log.warning('Got tapos_block_summary exception, switching node')
+                        self.log.warning(TS.bitshares_engine[19]) # Got tapos_block_summary exception, switching node
                         self.bitshares.clear()  # reinstantiates txbuilder (it caches ref_block_num)
                         # TODO: Notify still uses old node, needs to be switched!
                         self.bitshares.rpc.next()
                         new = self.bitshares.rpc.url
-                        self.log.info('Old: {}, new: {}'.format(old, new))
+                        self.log.info(TS.bitshares_engine[20].format(old, new)) # Old: {}, new: {}
                         tries += 1
                 else:
                     raise
@@ -919,9 +918,9 @@ class BitsharesOrderEngine(Storage, Events):
             diff_rel = diff_abs / order['base']['amount']
             if diff_rel > threshold:
                 self.log.debug(
-                    'Partially filled {} order: {} {} @ {:.8f}, filled: {:.2%}'.format(
+                    TS.bitshares_engine[21].format(
                         order_type, order['base']['amount'], order['base']['symbol'], price, diff_rel
-                    )
+                    ) # Partially filled {} order: {} {} @ {:.8f}, filled: {:.2%}
                 )
                 return True
         return False

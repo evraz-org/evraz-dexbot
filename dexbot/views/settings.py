@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
 from dexbot.controllers.settings_controller import SettingsController
 from dexbot.views.ui.settings_window_ui import Ui_settings_dialog
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class SettingsView(QDialog, Ui_settings_dialog):
     def __init__(self):
@@ -29,6 +29,10 @@ class SettingsView(QDialog, Ui_settings_dialog):
         self.restore_defaults = self.button_box.button(QDialogButtonBox.RestoreDefaults)
         self.discard = self.button_box.button(QDialogButtonBox.Discard)
         self.save = self.button_box.button(QDialogButtonBox.Save)
+
+        self.restore_defaults.setText(TS.settings[0])
+        self.discard.setText(TS.settings[1])
+        self.save.setText(TS.settings[2])
 
         self.discard.clicked.connect(self.reject)
         self.restore_defaults.clicked.connect(self.controller.restore_defaults)

@@ -1,5 +1,5 @@
 from dexbot.strategies.base import StrategyBase
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class Strategy(StrategyBase):
     """Echo strategy Strategy that logs all events within the blockchain."""
@@ -32,7 +32,7 @@ class Strategy(StrategyBase):
 
         :param bitshares.price.FilledOrder i: Filled order details
         """
-        self.log.info("Order matched: {}".format(i))
+        self.log.info(TS.echo[0].format(i))
 
     def print_orderPlaced(self, i):
         """
@@ -43,7 +43,7 @@ class Strategy(StrategyBase):
 
         :param bitshares.price.Order i: Order details
         """
-        self.log.info("Order placed: {}".format(i))
+        self.log.info(TS.echo[1].format(i))
 
     def print_UpdateCallOrder(self, i):
         """
@@ -54,7 +54,7 @@ class Strategy(StrategyBase):
 
         :param bitshares.price.CallOrder i: Call order details
         """
-        self.log.info("Call update: {}".format(i))
+        self.log.info(TS.echo[2].format(i))
 
     def print_marketUpdate(self, i):
         """
@@ -66,7 +66,7 @@ class Strategy(StrategyBase):
 
         :param object i: Can be instance of ``FilledOrder``, ``Order``, or ``CallOrder``
         """
-        self.log.info("Market update: {}".format(i))
+        self.log.info(TS.echo[3].format(i))
 
     def print_newBlock(self, i):
         """
@@ -79,7 +79,7 @@ class Strategy(StrategyBase):
                   need to know the most recent block number, you
                   need to use ``bitshares.blockchain.Blockchain``
         """
-        self.log.info("New block: {}".format(i))
+        self.log.info(TS.echo[4].format(i))
 
     def print_accountUpdate(self, i):
         """
@@ -87,4 +87,4 @@ class Strategy(StrategyBase):
 
         This includes anything that changes ``2.6.xxxx``, e.g., any operation that affects your account.
         """
-        self.log.info("Account: {}".format(i))
+        self.log.info(TS.echo[5].format(i))

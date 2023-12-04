@@ -1,2 +1,3 @@
 include *.md
 include dexbot/resources/img/*
+include dexbot/resources/translates/ru/*

@@ -1,3 +1,4 @@
+import os
 import time
 import webbrowser
 from threading import Thread
@@ -5,7 +6,8 @@ from threading import Thread
 from grapheneapi.exceptions import NumRetriesReached
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFontDatabase
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5 import QtCore
 
 from dexbot import __version__
 from dexbot.config import Config
@@ -20,7 +22,11 @@ from dexbot.views.settings import SettingsView
 from dexbot.views.ui.worker_list_window_ui import Ui_MainWindow
 from dexbot.views.unlock_wallet import UnlockWalletView
 from dexbot.views.worker_item import WorkerItemWidget
+from dexbot.translator_strings import TranslatorStrings as TS
 
+import dexbot.resources
+
+TRANSLATE_DIR = os.path.join(os.path.dirname(dexbot.resources.__file__), 'translates')
 
 class MainView(QMainWindow, Ui_MainWindow):
     def __init__(self, main_controller):
@@ -48,22 +54,42 @@ class MainView(QMainWindow, Ui_MainWindow):
         # Hide certain buttons by default until login success
         self.add_worker_button.hide()
 
-        self.status_bar.showMessage("ver {} - Node disconnected".format(__version__))
+        self.translate('ru')
+        self.status_bar.showMessage(TS.worker_list[0].format(__version__)) # ver {} - Node disconnected
 
         QFontDatabase.addApplicationFont(":/bot_widget/font/SourceSansPro-Bold.ttf")
+
+    def translate(self, current_lang):
+        app = QApplication.instance()
+        if app is None:
+            # if it does not exist then a QApplication is created
+            app = QApplication([])
+
+        try:
+            file_list:list[str] = [os.path.join(TRANSLATE_DIR, current_lang, e) for e in os.listdir(os.path.join(TRANSLATE_DIR, current_lang))] 
+
+            self.translators = []
+            for f in file_list:
+                self.translators.append(QtCore.QTranslator())
+                self.translators[-1].load(f)
+
+            for e in self.translators:
+                app.installTranslator(e)
+        except:
+            print("Error: Can't load translations!")
+
+        self.retranslateUi(self)
+        TS.retranslate()
 
     def connect_to_bitshares(self):
         # Check if there is already a connection
         if self.config['node']:
             # Test nodes first. This only checks if we're able to connect
-            self.status_bar.showMessage('Connecting to Bitshares...')
+            self.status_bar.showMessage(TS.worker_list[1]) # Connecting to Bitshares...
             try:
                 self.main_controller.measure_latency(self.config['node'])
             except NumRetriesReached:
-                self.status_bar.showMessage(
-                    'ver {} - Coudn\'t connect to Bitshares. '
-                    'Please use different node(s) and retry.'.format(__version__)
-                )
+                self.status_bar.showMessage(TS.worker_list[2].format(__version__)) # ver {} - Coudn\'t connect to Bitshares. Please use different node(s) and retry.
                 self.main_controller.set_bitshares_instance(None)
                 return False
 
@@ -72,9 +98,7 @@ class MainView(QMainWindow, Ui_MainWindow):
             return True
         else:
             # Config has no nodes in it
-            self.status_bar.showMessage(
-                'ver {} - Node(s) not found. ' 'Please add node(s) from settings.'.format(__version__)
-            )
+            self.status_bar.showMessage(TS.worker_list[3].format(__version__)) # ver {} - Node(s) not found. Please add node(s) from settings.
             return False
 
     @pyqtSlot(name='handle_login')
@@ -109,7 +133,7 @@ class MainView(QMainWindow, Ui_MainWindow):
             self.dispatcher = ThreadDispatcher(self)
             self.dispatcher.start()
 
-            self.status_bar.showMessage("ver {} - Node delay: - ms".format(__version__))
+            self.status_bar.showMessage(TS.worker_list[4].format(__version__)) # ver {} - Node delay: - ms
             self.status_bar_updater = Thread(target=self._update_statusbar_message)
             self.status_bar_updater.start()
 
@@ -189,7 +213,7 @@ class MainView(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         self.closing = True
-        self.status_bar.showMessage("Closing app...")
+        self.status_bar.showMessage(TS.worker_list[5]) # Closing app...
         if self.status_bar_updater and self.status_bar_updater.is_alive():
             self.status_bar_updater.join()
 
@@ -217,9 +241,9 @@ class MainView(QMainWindow, Ui_MainWindow):
             latency = -1
 
         if latency != -1:
-            return "ver {} - Node delay: {:.2f}ms - node: {}".format(__version__, latency, node)
+            return TS.worker_list[6].format(__version__, latency, node) # ver {} - Node delay: {:.2f}ms - node: {}
         else:
-            return "ver {} - Node disconnected".format(__version__)
+            return TS.worker_list[0].format(__version__) # ver {} - Node disconnected
 
     def set_statusbar_message(self, msg):
         self.status_bar.showMessage(msg)

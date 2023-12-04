@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 import dexbot.controllers.strategy_controller
 
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class StrategyFormWidget(QtWidgets.QWidget):
     def __init__(self, controller, strategy_module, worker_config=None):
@@ -59,7 +60,7 @@ class AutoStrategyFormGenerator:
         self.vertical_layout.setContentsMargins(0, 0, 0, 0)
 
         self.group_box = QtWidgets.QGroupBox(view)
-        self.group_box.setTitle("Worker Parameters")
+        self.group_box.setTitle(TS.strategy_form_title)
         self.vertical_layout.addWidget(self.group_box)
         self.form_layout = QtWidgets.QFormLayout(self.group_box)
 

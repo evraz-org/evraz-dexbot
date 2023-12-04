@@ -3,7 +3,7 @@ import math
 
 from bitshares.instance import shared_bitshares_instance
 from bitshares.price import Order
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class BitsharesPriceFeed:
     """
@@ -117,7 +117,7 @@ class BitsharesPriceFeed:
         try:
             order = orders[0]
         except IndexError:
-            self.log.info('Market has no buy orders.')
+            self.log.info(TS.bitshares_feed[0])
             return None
 
         return order
@@ -135,7 +135,7 @@ class BitsharesPriceFeed:
         try:
             order = orders[0]
         except IndexError:
-            self.log.info('Market has no sell orders.')
+            self.log.info(TS.bitshares_feed[1])
             return None
 
         return order
@@ -312,19 +312,19 @@ class BitsharesPriceFeed:
 
         if buy_price is None or buy_price == 0.0:
             if not suppress_errors:
-                self.log.critical("Cannot estimate center price, there is no highest bid.")
+                self.log.critical(TS.bitshares_feed[2])
                 self.disabled = True
                 return None
 
         if sell_price is None or sell_price == 0.0:
             if not suppress_errors:
-                self.log.critical("Cannot estimate center price, there is no lowest ask.")
+                self.log.critical(TS.bitshares_feed[3])
                 self.disabled = True
                 return None
             # Calculate and return market center price. make sure buy_price has value
         if buy_price:
             center_price = buy_price * math.sqrt(sell_price / buy_price)
-            self.log.debug('Center price in get_market_center_price: {:.8f} '.format(center_price))
+            self.log.debug(TS.bitshares_feed[4].format(center_price))
         return center_price
 
     def get_market_spread(self, quote_amount=0, base_amount=0):

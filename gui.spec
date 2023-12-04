@@ -32,6 +32,7 @@ hiddenimports_packaging = [
 # We're not importing migrations anywhere, so we need to package them as data files
 data_files = [
     ('dexbot/migrations', 'migrations'),
+    ('dexbot/resources/translates', 'dexbot/resources/translates'),
 ]
 
 a = Analysis(

@@ -10,7 +10,7 @@ from .confirmation import ConfirmationDialog
 from .edit_worker import EditWorkerView
 from .ui.worker_item_widget_ui import Ui_widget
 from .worker_details import WorkerDetailsView
-
+from dexbot.translator_strings import TranslatorStrings as TS
 
 class WorkerItemWidget(QtWidgets.QWidget, Ui_widget):
     def __init__(self, worker_name, config, main_ctrl, view):
@@ -73,23 +73,23 @@ class WorkerItemWidget(QtWidgets.QWidget, Ui_widget):
 
     @gui_error
     def start_worker(self):
-        self.set_status("Starting worker")
+        self.set_status(TS.worker_item[0]) # Starting worker
         self._start_worker()
         self.main_ctrl.start_worker(self.worker_name, self.worker_config, self.view)
 
     def _start_worker(self):
         self.running = True
-        self._toggle_worker('TURN WORKER OFF', QtCore.Qt.AlignRight)
+        self._toggle_worker(TS.worker_item[1], QtCore.Qt.AlignRight) # TURN WORKER OFF
 
     @gui_error
     def pause_worker(self):
-        self.set_status("Pausing worker")
+        self.set_status(TS.worker_item[2]) # Pausing worker
         self._pause_worker()
         self.main_ctrl.pause_worker(self.worker_name)
 
     def _pause_worker(self):
         self.running = False
-        self._toggle_worker('TURN WORKER ON', QtCore.Qt.AlignLeft)
+        self._toggle_worker(TS.worker_item[3], QtCore.Qt.AlignLeft) # TURN WORKER ON
 
     def set_worker_name(self, value):
         self.worker_name_label.setText(value)
@@ -143,7 +143,7 @@ class WorkerItemWidget(QtWidgets.QWidget, Ui_widget):
 
     @gui_error
     def remove_widget_dialog(self):
-        dialog = ConfirmationDialog('Are you sure you want to remove worker "{}"?'.format(self.worker_name))
+        dialog = ConfirmationDialog(TS.worker_item[4].format(self.worker_name)) # Are you sure you want to remove worker "{}"?
         return_value = dialog.exec_()
         if return_value:
             self.remove_widget()
