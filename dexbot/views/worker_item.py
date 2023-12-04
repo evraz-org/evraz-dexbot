@@ -184,3 +184,9 @@ class WorkerItemWidget(QtWidgets.QWidget, Ui_widget):
 
     def set_status(self, status):
         self.worker_status.setText(status)
+
+    def changeEvent(self, event):
+        if event.type() == QtCore.QEvent.LanguageChange:
+            self.retranslateUi(self)
+            self.set_worker_name(self.worker_name)
+        super(WorkerItemWidget, self).changeEvent(event)

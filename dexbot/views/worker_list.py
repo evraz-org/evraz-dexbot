@@ -6,7 +6,7 @@ from threading import Thread
 from grapheneapi.exceptions import NumRetriesReached
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFontDatabase
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton
 from PyQt5 import QtCore
 
 from dexbot import __version__
@@ -27,6 +27,9 @@ from dexbot.translator_strings import TranslatorStrings as TS
 import dexbot.resources
 
 TRANSLATE_DIR = os.path.join(os.path.dirname(dexbot.resources.__file__), 'translates')
+
+TRANSLATE_BN_NORMAL = 'QPushButton {border: 0px; background-color: #424242; width: 50px; height: 20px; border-radius: 5px; color: #ffffff;}'
+TRANSLATE_BN_SELECTED = 'QPushButton {border: 0px; background-color: #ffffff; width: 50px; height: 20px; border-radius: 5px; color: black;}'
 
 class MainView(QMainWindow, Ui_MainWindow):
     def __init__(self, main_controller):
@@ -59,11 +62,25 @@ class MainView(QMainWindow, Ui_MainWindow):
 
         QFontDatabase.addApplicationFont(":/bot_widget/font/SourceSansPro-Bold.ttf")
 
+        self.enButton = QPushButton("en")
+        self.enButton.setStyleSheet(TRANSLATE_BN_NORMAL)
+        self.enButton.clicked.connect(self.translate_en)
+        self.status_bar.addPermanentWidget(self.enButton)
+
+        self.ruButton = QPushButton("ru")
+        self.ruButton.setStyleSheet(TRANSLATE_BN_SELECTED)
+        self.ruButton.clicked.connect(self.translate_ru)
+        self.status_bar.addPermanentWidget(self.ruButton)
+
     def translate(self, current_lang):
         app = QApplication.instance()
         if app is None:
             # if it does not exist then a QApplication is created
             app = QApplication([])
+
+        if hasattr(self, 'translators'):
+            for e in self.translators:
+                app.removeTranslator(e)
 
         try:
             file_list:list[str] = [os.path.join(TRANSLATE_DIR, current_lang, e) for e in os.listdir(os.path.join(TRANSLATE_DIR, current_lang))] 
@@ -76,10 +93,22 @@ class MainView(QMainWindow, Ui_MainWindow):
             for e in self.translators:
                 app.installTranslator(e)
         except:
-            print("Error: Can't load translations!")
+            if current_lang != "en":
+                print("Error: Can't load translations!")
 
         self.retranslateUi(self)
         TS.retranslate()
+        self.status_bar.showMessage(self.get_statusbar_message())
+
+    def translate_en(self):
+        self.translate('en')
+        self.enButton.setStyleSheet(TRANSLATE_BN_SELECTED)
+        self.ruButton.setStyleSheet(TRANSLATE_BN_NORMAL)
+
+    def translate_ru(self):
+        self.translate('ru')
+        self.ruButton.setStyleSheet(TRANSLATE_BN_SELECTED)
+        self.enButton.setStyleSheet(TRANSLATE_BN_NORMAL)
 
     def connect_to_bitshares(self):
         # Check if there is already a connection
@@ -234,8 +263,8 @@ class MainView(QMainWindow, Ui_MainWindow):
                 time.sleep(0.5)
 
     def get_statusbar_message(self):
-        node = self.main_controller.bitshares_instance.rpc.url
         try:
+            node = self.main_controller.bitshares_instance.rpc.url
             latency = self.main_controller.measure_latency(node)
         except BaseException:
             latency = -1

@@ -27,7 +27,8 @@
 QScrollBar {
     background-color: #ffffff;
 }
-</string>
+
+QStatusBar::item {border: None;}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="autoFillBackground">
