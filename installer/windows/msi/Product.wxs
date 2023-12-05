@@ -61,7 +61,7 @@
       <!-- End desktop shortcut -->
 
       <!-- Begin program files entry-->
-      <Directory Id="ProgramFilesFolder">
+      <Directory Id="ProgramFiles64Folder">
         <Directory Id="APPLICATIONFOLDER" Name="EVRAZ">
           <Directory Id="INSTALLDIR" Name="$(var.ApplicationName)" >
           </Directory>

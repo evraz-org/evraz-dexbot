@@ -26,6 +26,20 @@
     <CompilerAdditionalOptions>
     </CompilerAdditionalOptions>
   </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>ApplicationVersion=$(ApplicationVersion);Build=$(Configuration)</DefineConstants>
+    <CompilerAdditionalOptions>
+    </CompilerAdditionalOptions>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>ApplicationVersion=$(ApplicationVersion);Build=$(Configuration)</DefineConstants>
+    <CompilerAdditionalOptions>
+    </CompilerAdditionalOptions>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="bundle.wxs" />
   </ItemGroup>
@@ -61,6 +75,19 @@
   </Target>
   <PropertyGroup>
     <PreBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DefineConstants>ApplicationVersion=$(ApplicationVersion);Build=$(Configuration)</DefineConstants>
+    <CompilerAdditionalOptions />
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineConstants>ApplicationVersion=$(ApplicationVersion);Build=$(Configuration)</DefineConstants>
+    <CompilerAdditionalOptions />
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <SuppressPdbOutput>True</SuppressPdbOutput>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
