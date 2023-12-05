@@ -26,7 +26,7 @@
       <Variable Name="DefaultAllUsersTargetDir" Value="[ProgramFiles64Folder]Python[WinVerNoDot]" bal:Overridable="yes" />
       <Variable Name="TargetPlatform" Value="x86" />
     <?endif ?>
-    <Variable Name="LaunchTarget" Value="[ProgramFiles64Folder]\Bitshares\DEXBot\DEXBot.exe"/>
+    <Variable Name="LaunchTarget" Value="[ProgramFiles64Folder]\EVRAZ\DEXBot\DEXBot.exe"/>
 
     <Chain>
       <ExePackage Id="Python"
