@@ -56,6 +56,7 @@ class MainView(QMainWindow, Ui_MainWindow):
 
         # Hide certain buttons by default until login success
         self.add_worker_button.hide()
+        self.widget_5.layout().removeWidget(self.add_worker_button)
 
         self.translate('ru')
         self.status_bar.showMessage(TS.worker_list[0].format(__version__)) # ver {} - Node disconnected
@@ -146,6 +147,9 @@ class MainView(QMainWindow, Ui_MainWindow):
         if unlock_view.exec_():
             # Hide button once successful wallet creation / login
             self.unlock_wallet_button.hide()
+            self.widget_5.layout().removeWidget(self.unlock_wallet_button)
+
+            self.widget_5.layout().addWidget(self.add_worker_button)
             self.add_worker_button.show()
 
             # Load worker widgets from config file

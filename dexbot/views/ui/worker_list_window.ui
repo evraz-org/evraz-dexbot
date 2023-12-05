@@ -38,13 +38,6 @@ QStatusBar::item {border: None;}</string>
     <string notr="true"/>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="2" column="0">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="0">
      <widget class="QScrollArea" name="scrollArea">
       <property name="sizePolicy">
@@ -77,7 +70,7 @@ QStatusBar::item {border: None;}</string>
          <x>0</x>
          <y>0</y>
          <width>1029</width>
-         <height>341</height>
+         <height>359</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -127,12 +120,6 @@ QStatusBar::item {border: None;}</string>
            <height>50</height>
           </size>
          </property>
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>16777215</height>
-          </size>
-         </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <widget class="QLabel" name="dexbot_logo">
@@ -142,16 +129,10 @@ QStatusBar::item {border: None;}</string>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>60</height>
-             </size>
-            </property>
             <property name="maximumSize">
              <size>
-              <width>100</width>
-              <height>60</height>
+              <width>215</width>
+              <height>67</height>
              </size>
             </property>
             <property name="text">
@@ -171,7 +152,7 @@ QStatusBar::item {border: None;}</string>
          </layout>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignVCenter">
         <widget class="QWidget" name="actions_wrap" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
@@ -180,15 +161,30 @@ QStatusBar::item {border: None;}</string>
           <property name="margin" stdset="0">
            <number>0</number>
           </property>
-          <item>
+          <item alignment="Qt::AlignTop">
            <widget class="QWidget" name="widget_5" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>70</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>250</width>
-              <height>80</height>
+              <height>70</height>
              </size>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="spacing">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QPushButton" name="unlock_wallet_button">
                <property name="sizePolicy">
@@ -222,22 +218,6 @@ QStatusBar::item {border: None;}</string>
                 <string>Unlock wallet</string>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Expanding</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
              <item>
               <widget class="QPushButton" name="add_worker_button">
@@ -290,13 +270,13 @@ QStatusBar::item {border: None;}</string>
          <property name="minimumSize">
           <size>
            <width>120</width>
-           <height>100</height>
+           <height>70</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>120</width>
-           <height>100</height>
+           <height>70</height>
           </size>
          </property>
          <property name="layoutDirection">
@@ -304,6 +284,18 @@ QStatusBar::item {border: None;}</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
+           <number>5</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <property name="margin" stdset="0">
@@ -359,26 +351,17 @@ QStatusBar::item {border: None;}</string>
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>25</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
      </widget>
     </item>
    </layout>
