@@ -1006,8 +1006,12 @@
     </message>
     <message>
         <location filename="../../translator_strings.py" line="145"/>
+        <source>Increasing {} order at price</source>
+        <translation>Увеличение ордера {}</translation>
+    </message>
+    <message>
         <source>Increasing {} order at price {:.8f}: {:.{prec}f} -&gt; {:.{prec}f} {} ({:.{opposite_prec}f} -&gt; {:.{opposite_prec}f} {})</source>
-        <translation>Увеличение ордера {} по цене {:.8f}: {:.{prec}f} -&gt; {:.{prec}f} {} ({:.{opposite_prec}f} -&gt; {:.{opposite_prec}f} {})</translation>
+        <translation type="vanished">Увеличение ордера {} по цене {:.8f}: {:.{prec}f} -&gt; {:.{prec}f} {} ({:.{opposite_prec}f} -&gt; {:.{opposite_prec}f} {})</translation>
     </message>
     <message>
         <location filename="../../translator_strings.py" line="146"/>

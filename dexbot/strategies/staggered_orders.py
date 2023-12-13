@@ -1433,18 +1433,7 @@ class Strategy(StrategyBase):
                 old_opposite_amount = orders[index]['quote']['amount']
                 new_opposite_amount = order['quote']['amount']
                 self.log.info(
-                    TS.staggered_orders[45].format(
-                        order_type,
-                        price,
-                        old_amount,
-                        new_amount,
-                        symbol,
-                        old_opposite_amount,
-                        new_opposite_amount,
-                        opposite_symbol,
-                        prec=precision,
-                        opposite_prec=opposite_precision,
-                    )
+                    TS.staggered_orders[45].format(order_type)
                 )
                 self.log.debug(
                     TS.staggered_orders[46].format(

@@ -142,7 +142,7 @@ class TranslatorStrings:
         cls.staggered_orders.append(QA.translate("staggered_orders", "Placing first {} order"))
         cls.staggered_orders.append(QA.translate("staggered_orders", "Not enough balance to increase {} order at price {:.8f}: {:.{prec}f}/{:.{prec}f} {}"))
         cls.staggered_orders.append(QA.translate("staggered_orders", "Pre-increasing {} order at price {:.8f} from {:.{prec}f} to {:.{prec}f} {}"))
-        cls.staggered_orders.append(QA.translate("staggered_orders", "Increasing {} order at price {:.8f}: {:.{prec}f} -> {:.{prec}f} {} ({:.{opposite_prec}f} -> {:.{opposite_prec}f} {})"))
+        cls.staggered_orders.append(QA.translate("staggered_orders", "Increasing {} order at price"))
         cls.staggered_orders.append(QA.translate("staggered_orders", "Cancelling {} order in increase_order_sizes(); mode: {}, amount: {}, price: {:.8f}"))
         cls.staggered_orders.append(QA.translate("staggered_orders", "Partially filled {} order: {} {} @ {:.8f}, filled: {:.2%}"))
         cls.staggered_orders.append(QA.translate("staggered_orders", "Replacing partially filled {} order"))
